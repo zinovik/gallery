@@ -10,7 +10,7 @@ import { HomePage } from '../pages/HomePage';
 import { getFilteredAlbumsWithFiles } from '../services';
 import { PARAMETER_DATE_RANGES, PARAMETER_FILE } from '../constants';
 import { AlbumWithFiles } from '../types';
-import { AdminInfo } from '../components/AdminInfo';
+import { AdminUpdated } from '../components/AdminUpdated';
 import { ShowMode } from '../components/ShowMode';
 import { AdminLogin } from '../components/AdminLogin';
 import { Link } from 'react-router-dom';
@@ -123,8 +123,8 @@ export const MainRouter = () => {
         <main>⏳ Loading...</main>
       ) : albumsWithFiles.length > 0 ? (
         <>
+          <AdminUpdated />
           <AdminLogin />
-          <AdminInfo />
 
           <div style={{ textAlign: 'center' }}>
             <ShowMode dateRanges={dateRanges} />

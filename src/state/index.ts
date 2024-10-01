@@ -1,4 +1,4 @@
-import { sortAlbums, sortFiles } from './helper';
+import { sortAlbums, sortFiles } from './sort';
 import {
   AddedAlbum,
   AlbumInterface,
@@ -59,12 +59,16 @@ export const addAddedAlbum = (addedAlbum: AddedAlbum): void => {
   );
 
   state.allAlbums = sortAlbums(albumsWithAdded);
+  state.allFiles = sortFiles(state.allFiles, state.allAlbums);
 };
 
 export const addUpdatedAlbum = (updatedAlbum: UpdatedAlbum): void => {
   let isUpdated = false;
   state.updatedAlbums = state.updatedAlbums.map((alreadyUpdatedAlbum) => {
-    if (alreadyUpdatedAlbum.newPath === updatedAlbum.path) {
+    if (
+      (alreadyUpdatedAlbum.newPath || alreadyUpdatedAlbum.path) ===
+      updatedAlbum.path
+    ) {
       isUpdated = true;
       return updatedAlbum;
     }
@@ -95,6 +99,7 @@ export const addUpdatedAlbum = (updatedAlbum: UpdatedAlbum): void => {
   );
 
   state.allAlbums = sortAlbums(loadedAlbumsUpdated);
+  state.allFiles = sortFiles(state.allFiles, state.allAlbums);
 };
 
 export const addUpdatedFile = (updatedFile: UpdatedFile): void => {
@@ -154,6 +159,7 @@ export const addRemovedFile = (removedFile: RemovedFile): void => {
 };
 
 export const getUser = () => state.user || null;
+
 export const setUser = (user: User | null) => {
   state.user = user;
 };
