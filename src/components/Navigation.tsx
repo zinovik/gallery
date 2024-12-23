@@ -1,14 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { getLinks } from '../utils';
-import { getAllAlbums } from '../state';
+import { getLinks } from '../services/utils';
+import { selectAllAlbums } from '../app/stateSlices/allAlbumsAndFilesSlice';
+import { useAppSelector } from '../app/hooks';
 
 interface Props {
   path: string;
 }
 
 export const Navigation = ({ path }: Props) => {
-  const links = getLinks(path, getAllAlbums());
+  const allAlbums = useAppSelector(selectAllAlbums);
+
+  const links = getLinks(path, allAlbums);
 
   return (
     <nav style={{ textAlign: 'right', paddingTop: '1rem' }}>

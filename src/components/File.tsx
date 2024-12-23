@@ -7,7 +7,7 @@ import { Markdown } from './Markdown';
 import { FileInterface, FileType } from '../types';
 import { useSearchParams } from 'react-router-dom';
 import { AdminFile } from './AdminFile';
-import { formatDatetime, getThumbnail } from '../utils';
+import { formatDatetime, getThumbnail } from '../services/utils';
 
 interface Props {
   file: FileInterface;

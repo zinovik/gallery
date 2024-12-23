@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { formatDatetime } from '../utils';
+import { formatDatetime } from '../services/utils';
 import { PARAMETER_DATE_RANGES } from '../constants';
 
 interface Props {

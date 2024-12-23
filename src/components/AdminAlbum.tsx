@@ -1,21 +1,23 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { AlbumInterface } from '../types';
 import {
-  addUpdatedAlbum,
   addAddedAlbum,
   addRemovedAlbum,
-  getIsEditModeEnabled,
-} from '../state';
-import { ForceUpdateContext } from '../routers/MainRouter';
+  addUpdatedAlbum,
+  selectIsEditModeEnabled,
+} from '../app/stateSlices/allAlbumsAndFilesSlice';
+import { useAppDispatch, useAppSelector } from '../app/hooks';
 
 interface Props {
   album: AlbumInterface;
 }
 
 export const AdminAlbum = ({ album }: Props) => {
-  const forceUpdate = useContext(ForceUpdateContext);
+  const dispatch = useAppDispatch();
 
-  if (!getIsEditModeEnabled()) {
+  const isEditModeEnabled = useAppSelector(selectIsEditModeEnabled);
+
+  if (!isEditModeEnabled) {
     return null;
   }
 
@@ -46,16 +48,17 @@ export const AdminAlbum = ({ album }: Props) => {
           )
             return;
 
-          addUpdatedAlbum({
-            path: album.path,
-            newPath,
-            title: newTitle,
-            text: newTextString.includes('---')
-              ? newTextString.split('---')
-              : newTextString,
-            accesses: newAccessesString.split(','),
-          });
-          forceUpdate();
+          dispatch(
+            addUpdatedAlbum({
+              path: album.path,
+              newPath,
+              title: newTitle,
+              text: newTextString.includes('---')
+                ? newTextString.split('---')
+                : newTextString,
+              accesses: newAccessesString.split(','),
+            })
+          );
         }}
       >
         edit album
@@ -74,16 +77,17 @@ export const AdminAlbum = ({ album }: Props) => {
           );
           if (!['after', 'before'].includes(relation as string)) return;
 
-          addAddedAlbum({
-            path,
-            title,
-            text: newTextString.includes('---')
-              ? newTextString.split('---')
-              : newTextString,
-            relatedPath: album.path,
-            relation: relation as 'after' | 'before',
-          });
-          forceUpdate();
+          dispatch(
+            addAddedAlbum({
+              path,
+              title,
+              text: newTextString.includes('---')
+                ? newTextString.split('---')
+                : newTextString,
+              relatedPath: album.path,
+              relation: relation as 'after' | 'before',
+            })
+          );
         }}
       >
         add album
@@ -92,10 +96,7 @@ export const AdminAlbum = ({ album }: Props) => {
         onClick={() => {
           if (!window.confirm(`Remove ${album.path}?`)) return;
 
-          addRemovedAlbum({
-            path: album.path,
-          });
-          forceUpdate();
+          dispatch(addRemovedAlbum({ path: album.path }));
         }}
       >
         remove album

@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { HashLink } from 'react-router-hash-link';
 import { AgendaInterface } from '../types';
-import { getLevel } from '../utils';
+import { getLevel } from '../services/utils';
 
 interface Props {
   agenda: AgendaInterface[];

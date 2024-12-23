@@ -1,23 +1,20 @@
 import { AlbumInterface, FileInterface } from '../types';
 
-export const isThisOrChildPath = (
-  childPath: string,
-  parentPath: string
-): boolean =>
+const isThisOrChildPath = (childPath: string, parentPath: string): boolean =>
   childPath === parentPath || childPath.startsWith(`${parentPath}/`);
 
 const isTopLevelPath = (path: string): boolean => !path.includes('/');
 
 export const filterAlbumsByPath = ({
-  loadedAlbums,
+  albums,
   path,
 }: {
-  loadedAlbums: AlbumInterface[];
+  albums: AlbumInterface[];
   path: string;
 }): AlbumInterface[] => {
   return path === ''
-    ? loadedAlbums
-    : loadedAlbums.filter((album) =>
+    ? albums
+    : albums.filter((album) =>
         path === '/'
           ? isTopLevelPath(album.path)
           : isThisOrChildPath(album.path, path)
@@ -25,15 +22,15 @@ export const filterAlbumsByPath = ({
 };
 
 export const filterFilesByPathAndDateRanges = ({
-  loadedFiles,
+  files,
   path,
   dateRanges,
 }: {
-  loadedFiles: FileInterface[];
+  files: FileInterface[];
   path?: string;
   dateRanges?: string[][];
 }): FileInterface[] =>
-  loadedFiles.filter((file) => {
+  files.filter((file) => {
     if (path && !isThisOrChildPath(file.path, path)) {
       return false;
     }

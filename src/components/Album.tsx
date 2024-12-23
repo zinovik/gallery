@@ -7,7 +7,7 @@ import { Agenda } from './Agenda';
 import { AgendaInterface, AlbumWithFiles } from '../types';
 import { AdminAlbum } from './AdminAlbum';
 import { HashLink } from 'react-router-hash-link';
-import { getLevel } from '../utils';
+import { getLevel } from '../services/utils';
 import { PARAMETER_DATE_RANGES } from '../constants';
 
 interface Props {

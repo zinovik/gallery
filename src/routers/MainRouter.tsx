@@ -1,168 +1,111 @@
-import React, { useEffect, useState, useReducer, createContext } from 'react';
-import {
-  useParams,
-  useSearchParams,
-  useLocation,
-  useNavigate,
-} from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useParams, useSearchParams, useLocation } from 'react-router-dom';
 import { AlbumPage } from '../pages/AlbumPage';
 import { HomePage } from '../pages/HomePage';
-import { getFilteredAlbumsWithFiles } from '../services';
-import { PARAMETER_DATE_RANGES, PARAMETER_FILE } from '../constants';
-import { AlbumWithFiles } from '../types';
-import { AdminUpdated } from '../components/AdminUpdated';
+import { getAlbumsWithFilesToShow } from '../services/getAlbumsWithFilesToShow';
+import { AdminChanges } from '../components/AdminChanges';
 import { ShowMode } from '../components/ShowMode';
 import { AdminLogin } from '../components/AdminLogin';
-import { Link } from 'react-router-dom';
-
-export const ForceUpdateContext = createContext(() => null as any);
+import { Navigation } from '../components/Navigation';
+import { parseUrl } from '../services/utils';
+import {
+  apiLoad,
+  selectAllAlbums,
+  selectAllFiles,
+  selectIsApiLoading,
+  selectShouldLoad,
+  setCurrentMainPath,
+  setIsShowingByDate,
+} from '../app/stateSlices/allAlbumsAndFilesSlice';
+import { useAppDispatch, useAppSelector } from '../app/hooks';
+import { ScrollTo } from '../components/ScrollTo';
 
 export const MainRouter = () => {
-  const [updateKey, forceUpdate] = useReducer((x) => x + 1, 0);
+  const dispatch = useAppDispatch();
 
-  const [isLoading, setIsLoading] = useState(true);
+  const isApiLoading = useAppSelector(selectIsApiLoading);
+  const allAlbums = useAppSelector(selectAllAlbums);
+  const allFiles = useAppSelector(selectAllFiles);
+  const shouldLoad = useAppSelector(selectShouldLoad);
 
-  const [isHomePathAndAlbumsShowing, setIsHomePathAndAlbumsShowing] = useState(
-    false as boolean | undefined
+  const { path, dateRanges, scrolledToFile, scrolledToAlbum } = parseUrl(
+    useParams(),
+    useSearchParams()[0],
+    useLocation()
   );
-
-  const [dateRanges, setDateRanges] = useState(
-    undefined as string[][] | undefined
-  );
-  const [searchParams, setSearchParams] = useSearchParams();
-  const dateRangesParameter = searchParams.get(PARAMETER_DATE_RANGES);
-  const scrolledToFile = searchParams.get(PARAMETER_FILE) ?? '';
-
-  const { hash } = useLocation();
-  const scrolledToAlbum = hash.substring(1);
-
-  const { '*': route = '' } = useParams();
-  const path = `${route}`.replace(/\/+$/, '');
-
-  const [previousRoute, setPreviousRoute] = useState(route);
-
-  const [albumsWithFiles, setAlbumWithFiles] = useState([] as AlbumWithFiles[]);
-
-  const navigate = useNavigate();
 
   useEffect(() => {
-    const dateRanges = dateRangesParameter
-      ?.split(',')
-      .map((dateRange) => dateRange.split('-'));
+    (async () => {
+      dispatch(setCurrentMainPath(path));
+      dispatch(setIsShowingByDate(Boolean(dateRanges)));
 
-    setDateRanges(dateRanges);
-    setIsLoading(true);
-
-    getFilteredAlbumsWithFiles({ path, dateRanges }).then(
-      ({ albumsWithFiles, isHomePathAndAlbumsShowing }) => {
-        setIsLoading(false);
-        setAlbumWithFiles(albumsWithFiles);
-        setIsHomePathAndAlbumsShowing(isHomePathAndAlbumsShowing);
+      if (shouldLoad) {
+        await dispatch(apiLoad(false));
       }
-    );
-  }, [path, dateRangesParameter, updateKey, navigate]);
+    })();
+  }, [path, dateRanges, dispatch, shouldLoad]);
 
-  useEffect(() => {
-    if (albumsWithFiles.length === 0) return;
+  const albumsWithFilesToShow = getAlbumsWithFilesToShow({
+    allAlbums,
+    allFiles,
+    path,
+    dateRanges,
+  });
 
-    const removeFileParam = (event: Event) => {
-      searchParams.delete('file');
-      setSearchParams(searchParams);
-      event.stopPropagation();
-      window.removeEventListener('wheel', removeFileParam);
-      window.removeEventListener('touchmove', removeFileParam);
-    };
-
-    const scrolledTo = scrolledToFile || scrolledToAlbum;
-
-    if (scrolledTo) {
-      setTimeout(() => {
-        const element = document.getElementById(scrolledTo);
-        if (!element) return;
-
-        window.removeEventListener('wheel', removeFileParam);
-        window.removeEventListener('touchmove', removeFileParam);
-
-        element.scrollIntoView({
-          block: scrolledToFile ? 'center' : 'nearest',
-        });
-        if (scrolledToFile) {
-          window.addEventListener('wheel', removeFileParam);
-          window.addEventListener('touchmove', removeFileParam);
-        }
-      }, 800); // delay after page loading to scroll to the right place ¯\_(ツ)_/¯
-    }
-
-    if (!scrolledToFile) {
-      window.removeEventListener('wheel', removeFileParam);
-      window.removeEventListener('touchmove', removeFileParam);
-    }
-
-    return () => {
-      window.removeEventListener('wheel', removeFileParam);
-      window.removeEventListener('touchmove', removeFileParam);
-    };
-  }, [
-    albumsWithFiles,
-    scrolledToAlbum,
-    scrolledToFile,
-    searchParams,
-    setSearchParams,
-  ]);
-
-  useEffect(() => {
-    if (route !== previousRoute) {
-      setPreviousRoute(route);
-      if (!scrolledToFile && !scrolledToAlbum) window.scrollTo(0, 0);
-    }
-  }, [scrolledToFile, scrolledToAlbum, route, previousRoute, setPreviousRoute]);
+  const isHomePathAndAlbumsShowing = !dateRanges && path === '/';
 
   return (
-    <ForceUpdateContext.Provider value={() => forceUpdate()}>
-      {isLoading && (
+    <>
+      {isApiLoading && (
         <main style={{ padding: '0.5rem' }}>⏳ Loading... Please wait</main>
       )}
 
-      {!isLoading && albumsWithFiles.length > 0 && (
+      {!isApiLoading && (
         <>
-          <AdminUpdated />
+          <AdminChanges />
           <AdminLogin />
 
-          <div style={{ textAlign: 'center' }}>
-            <ShowMode dateRanges={dateRanges} />
-          </div>
+          {albumsWithFilesToShow.length > 0 && (
+            <>
+              <div style={{ textAlign: 'center' }}>
+                <ShowMode dateRanges={dateRanges} />
+              </div>
 
-          {isHomePathAndAlbumsShowing ? (
-            <HomePage
-              albums={albumsWithFiles.map(
-                (albumWithFiles) => albumWithFiles.album
+              {isHomePathAndAlbumsShowing ? (
+                <HomePage
+                  albums={albumsWithFilesToShow.map(
+                    (albumWithFiles) => albumWithFiles.album
+                  )}
+                />
+              ) : (
+                <AlbumPage
+                  albumsWithFiles={albumsWithFilesToShow}
+                  path={path}
+                  isHiddenHashLink={Boolean(dateRanges)}
+                  currentFile={scrolledToFile}
+                />
               )}
-            />
-          ) : (
-            <AlbumPage
-              albumsWithFiles={albumsWithFiles}
-              path={path}
-              dateRanges={dateRanges}
-              currentFile={scrolledToFile}
-            />
+
+              <ScrollTo
+                path={path}
+                scrolledToAlbum={scrolledToAlbum}
+                scrolledToFile={scrolledToFile}
+              />
+            </>
+          )}
+
+          {albumsWithFilesToShow.length === 0 && (
+            <>
+              <Navigation path="home" />
+              <main style={{ padding: '1rem' }}>
+                No albums or photos are available (or you don't have access to
+                them). Please try logging in or adjusting the album path (or
+                dates)."
+              </main>
+            </>
           )}
         </>
       )}
-
-      {!isLoading && albumsWithFiles.length === 0 && (
-        <>
-          <AdminUpdated />
-          <AdminLogin />
-          <nav style={{ textAlign: 'right', paddingTop: '1rem' }}>
-            <Link to={'/'}>home</Link>
-          </nav>
-          <main style={{ padding: '1rem' }}>
-            No albums or photos are available (or you don't have access to
-            them). Please try logging in or adjusting the album path (or
-            dates)."
-          </main>
-        </>
-      )}
-    </ForceUpdateContext.Provider>
+    </>
   );
 };

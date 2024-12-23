@@ -1,26 +1,29 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { FileInterface } from '../types';
+import { useAppSelector } from '../app/hooks';
 import {
-  addUpdatedFile,
   addRemovedFile,
-  getIsEditModeEnabled,
   addSelectedFile,
+  addUpdatedFile,
   removeSelectedFile,
-  getSelectedFiles,
-} from '../state';
-import { ForceUpdateContext } from '../routers/MainRouter';
+  selectIsEditModeEnabled,
+  selectSelectedFiles,
+} from '../app/stateSlices/allAlbumsAndFilesSlice';
+import { useDispatch } from 'react-redux';
 
 interface Props {
   file: FileInterface;
 }
 
 export const AdminFile = ({ file }: Props) => {
-  const forceUpdate = useContext(ForceUpdateContext);
-
   const { description, text } = file;
-  const selectedFiles = getSelectedFiles();
 
-  if (!getIsEditModeEnabled()) {
+  const dispatch = useDispatch();
+
+  const isEditModeEnabled = useAppSelector(selectIsEditModeEnabled);
+  const selectedFiles = useAppSelector(selectSelectedFiles);
+
+  if (!isEditModeEnabled) {
     return null;
   }
 
@@ -31,11 +34,10 @@ export const AdminFile = ({ file }: Props) => {
         checked={selectedFiles.includes(file.filename)}
         onChange={(e) => {
           if (e.target.checked) {
-            addSelectedFile(file.filename);
+            dispatch(addSelectedFile(file.filename));
           } else {
-            removeSelectedFile(file.filename);
+            dispatch(removeSelectedFile(file.filename));
           }
-          forceUpdate();
         }}
       />
       <button
@@ -67,19 +69,18 @@ export const AdminFile = ({ file }: Props) => {
             selectedFiles.length > 0 ? selectedFiles : [file.filename];
 
           filenames.forEach((filename) =>
-            addUpdatedFile({
-              filename: filename,
-              path: newPath,
-              description: newDescription,
-              text: newTextString.includes('---')
-                ? newTextString.split('---')
-                : newTextString,
-              accesses: newAccessesString.split(','),
-            })
+            dispatch(
+              addUpdatedFile({
+                filename: filename,
+                path: newPath,
+                description: newDescription,
+                text: newTextString.includes('---')
+                  ? newTextString.split('---')
+                  : newTextString,
+                accesses: newAccessesString.split(','),
+              })
+            )
           );
-          removeSelectedFile();
-
-          forceUpdate();
         }}
       >
         {selectedFiles.length > 0 ? 'edit selected files' : 'edit file'}
@@ -88,10 +89,11 @@ export const AdminFile = ({ file }: Props) => {
         onClick={() => {
           if (!window.confirm(`Remove ${file.filename}?`)) return;
 
-          addRemovedFile({
-            filename: file.filename,
-          });
-          forceUpdate();
+          dispatch(
+            addRemovedFile({
+              filename: file.filename,
+            })
+          );
         }}
       >
         remove file

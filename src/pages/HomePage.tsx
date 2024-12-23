@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { AlbumInterface } from '../types';
-import { getLink } from '../utils';
+import { getLink } from '../services/utils';
 
 interface Props {
   albums: AlbumInterface[];

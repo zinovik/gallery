@@ -1,22 +1,24 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { CredentialResponse, GoogleLogin } from '@react-oauth/google';
-import { apiLoad, apiLogin, apiLogout } from '../services/api';
 import { IS_LOCAL_DEVELOPMENT } from '../constants';
-import { ForceUpdateContext } from '../routers/MainRouter';
-import { getUser, switchEditMode } from '../state';
+import {
+  apiLoad,
+  apiLogin,
+  apiLogout,
+  selectUser,
+  switchEditMode,
+} from '../app/stateSlices/allAlbumsAndFilesSlice';
+import { useAppDispatch, useAppSelector } from '../app/hooks';
 
 export const AdminLogin = () => {
-  const forceUpdate = useContext(ForceUpdateContext);
+  const dispatch = useAppDispatch();
 
   const clickHandler = async (token: string) => {
-    const isSuccess = await apiLogin(token);
-    await apiLoad(true);
-    if (isSuccess) {
-      forceUpdate();
-    }
+    await dispatch(apiLogin(token));
+    await dispatch(apiLoad(true));
   };
 
-  const user = getUser();
+  const user = useAppSelector(selectUser);
 
   return (
     <div
@@ -33,12 +35,9 @@ export const AdminLogin = () => {
             {user.email}{' '}
             <button
               onClick={async () => {
-                switchEditMode(false);
-                const isSuccess = await apiLogout();
-                await apiLoad(true);
-                if (isSuccess) {
-                  forceUpdate();
-                }
+                dispatch(switchEditMode(false));
+                await dispatch(apiLogout());
+                await dispatch(apiLoad(true));
               }}
             >
               logout
@@ -49,8 +48,7 @@ export const AdminLogin = () => {
               <div>
                 <button
                   onClick={() => {
-                    switchEditMode();
-                    forceUpdate();
+                    dispatch(switchEditMode());
                   }}
                 >
                   switch edit mode
