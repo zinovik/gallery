@@ -317,7 +317,7 @@ const albumsSlice = createSlice({
       .addCase(apiLogin.rejected, (state) => {
         state.isApiLogining = false;
       })
-      .addCase(apiLogin.fulfilled, (state, action) => {
+      .addCase(apiLogin.fulfilled, (_state, action) => {
         const [isSuccess, csrf] = action.payload;
 
         if (isSuccess) {

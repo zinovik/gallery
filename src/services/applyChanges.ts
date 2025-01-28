@@ -41,12 +41,6 @@ const addAlbums = (
   const albumsWithAdded = [...albums];
 
   addedAlbums.forEach((addedAlbum) => {
-    const relatedPathIndex = albumsWithAdded.findIndex(
-      (album) => album.path === addedAlbum.relatedPath
-    );
-
-    if (relatedPathIndex === -1) return;
-
     albumsWithAdded.push({
       title: addedAlbum.title,
       text: addedAlbum.text || undefined,

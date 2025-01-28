@@ -88,7 +88,7 @@ export const AdminAlbum = ({ album }: Props) => {
           if (title === null) return;
           const textString = prompt('text');
           if (textString === null) return;
-          const accessesString = prompt('accesses');
+          const accessesString = prompt('accesses', 'public');
           if (accessesString === null) return;
 
           dispatch(
@@ -98,7 +98,6 @@ export const AdminAlbum = ({ album }: Props) => {
               text: textString.includes('---')
                 ? textString.split('---')
                 : textString,
-              relatedPath: album.path,
               accesses: accessesString.split(','),
             })
           );

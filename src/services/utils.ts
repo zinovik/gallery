@@ -68,7 +68,7 @@ export const getLinks = ({
     const textPath = texts.slice(0, index + 1).join('/');
 
     const album = allAlbums.find((album) => album.path === textPath);
-    const url = getLink(textPath, album?.defaultByDate);
+    const url = getLink(textPath);
 
     return {
       text: album?.title || generateAlbumTitleByPath(url),
