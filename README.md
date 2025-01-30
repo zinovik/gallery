@@ -51,4 +51,8 @@ flowchart TB
 gcloud storage buckets create gs://zinovik-gallery --location=europe-central2
 gcloud storage buckets update gs://zinovik-gallery --cors-file=cors_file.json
 gcloud storage buckets describe gs://zinovik-gallery --format="default(cors_config)"
+gcloud storage buckets update gs://zinovik-gallery --clear-soft-delete
+gcloud storage buckets update gs://zinovik-gallery --enable-autoclass
+
+gcloud storage buckets update gs://zinovik-gallery --no-versioning
 ```
