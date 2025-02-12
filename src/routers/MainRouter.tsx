@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useParams, useSearchParams, useLocation } from 'react-router-dom';
 import { AlbumPage } from '../pages/AlbumPage';
 import { HomePage } from '../pages/HomePage';
@@ -49,17 +49,25 @@ export const MainRouter = () => {
     })();
   }, [currentPath, dateRanges, dispatch, shouldLoad, token]);
 
-  const { albums, files } = applyChanges({
-    allAlbums,
-    allFiles,
-    changes,
-  });
-  const albumsWithFilesToShow = getAlbumsWithFilesToShow({
-    allAlbums: albums,
-    allFiles: files,
-    currentPath,
-    dateRanges,
-  });
+  const { albums, files } = useMemo(
+    () =>
+      applyChanges({
+        allAlbums,
+        allFiles,
+        changes,
+      }),
+    [allAlbums, allFiles, changes]
+  );
+  const albumsWithFilesToShow = useMemo(
+    () =>
+      getAlbumsWithFilesToShow({
+        allAlbums: albums,
+        allFiles: files,
+        currentPath,
+        dateRanges,
+      }),
+    [albums, files, currentPath, dateRanges]
+  );
 
   return (
     <>

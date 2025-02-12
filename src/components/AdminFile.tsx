@@ -89,6 +89,50 @@ export const AdminFile = ({ file }: Props) => {
         {selectedFiles.length > 0 ? 'edit selected files' : 'edit file'}
       </button>
 
+      {selectedFiles.length > 0 && (
+        <button
+          onClick={async () => {
+            const newPath = prompt('path', file.path);
+            if (newPath === null) return;
+
+            selectedFiles.forEach((filename) =>
+              dispatch(
+                addUpdatedFile({
+                  filename: filename,
+                  path: newPath,
+                })
+              )
+            );
+
+            dispatch(removeSelectedFile());
+          }}
+        >
+          edit selected files path
+        </button>
+      )}
+
+      {selectedFiles.length > 0 && (
+        <button
+          onClick={async () => {
+            const newDescription = prompt('description', description ?? '');
+            if (newDescription === null) return;
+
+            selectedFiles.forEach((filename) =>
+              dispatch(
+                addUpdatedFile({
+                  filename: filename,
+                  description: newDescription,
+                })
+              )
+            );
+
+            dispatch(removeSelectedFile());
+          }}
+        >
+          edit selected files description
+        </button>
+      )}
+
       <button
         onClick={() => {
           if (!window.confirm(`Remove ${file.filename}?`)) return;

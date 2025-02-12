@@ -122,53 +122,58 @@ export const getThumbnail = (url: string, width: number): string => {
 
 export const getUpdatedAlbumChangedFields = (
   updatedAlbum: UpdatedAlbum,
-  currentAlbum?: AlbumInterface
+  currentAlbum: AlbumInterface
 ): {
   updatedAlbumChangedFields: Partial<AlbumInterface> & { path: string };
   newPath?: string | null;
 } => {
   const updatedAlbumChangedFields = {
     path: updatedAlbum.path,
-    ...(updatedAlbum.title !== currentAlbum?.title
+    ...(updatedAlbum.title !== undefined &&
+    updatedAlbum.title !== currentAlbum.title
       ? { title: updatedAlbum.title }
       : {}),
-    ...(updatedAlbum.text !== (currentAlbum?.text || '')
+    ...(updatedAlbum.text !== undefined &&
+    updatedAlbum.text !== (currentAlbum.text || '')
       ? { text: updatedAlbum.text }
       : {}),
-    ...(updatedAlbum.order !== (currentAlbum?.order || 0)
+    ...(updatedAlbum.order !== undefined &&
+    updatedAlbum.order !== (currentAlbum.order || 0)
       ? { order: updatedAlbum.order }
       : {}),
-    ...(updatedAlbum.accesses?.join(',') !==
-    (currentAlbum?.accesses || []).join(',')
+    ...(updatedAlbum.accesses !== undefined &&
+    updatedAlbum.accesses.join(',') !== currentAlbum.accesses.join(',')
       ? { accesses: updatedAlbum.accesses }
       : {}),
   };
 
   const newPath =
-    updatedAlbum.newPath !== currentAlbum?.path ? updatedAlbum.newPath : null;
+    updatedAlbum.newPath !== currentAlbum.path ? updatedAlbum.newPath : null;
 
   return { updatedAlbumChangedFields, newPath };
 };
 
 export const getUpdatedFileChangedFields = (
   updatedFile: UpdatedFile,
-  currentFile?: FileInterface
+  currentFile: FileInterface
 ): {
   updatedFileChangedFields: Partial<FileInterface> & { filename: string };
 } => {
   const updatedFileChangedFields = {
     filename: updatedFile.filename,
-    ...(updatedFile.path !== currentFile?.path
+    ...(updatedFile.path !== undefined && updatedFile.path !== currentFile.path
       ? { path: updatedFile.path }
       : {}),
-    ...(updatedFile.description !== (currentFile?.description || '')
+    ...(updatedFile.description !== undefined &&
+    updatedFile.description !== (currentFile.description || '')
       ? { description: updatedFile.description }
       : {}),
-    ...(updatedFile.text !== (currentFile?.text || '')
+    ...(updatedFile.text !== undefined &&
+    updatedFile.text !== (currentFile.text || '')
       ? { text: updatedFile.text }
       : {}),
-    ...(updatedFile.accesses?.join(',') !==
-    (currentFile?.accesses || []).join(',')
+    ...(updatedFile.accesses !== undefined &&
+    updatedFile.accesses.join(',') !== currentFile.accesses.join(',')
       ? {
           accesses: updatedFile.accesses,
         }

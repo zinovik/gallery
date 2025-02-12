@@ -140,6 +140,11 @@ const albumsSlice = createSlice({
         (album) => album.path === updatedAlbum.path
       );
 
+      if (!currentAlbum) {
+        alert('error updating the album!');
+        return;
+      }
+
       const { updatedAlbumChangedFields, newPath } =
         getUpdatedAlbumChangedFields(updatedAlbum, currentAlbum);
 
@@ -231,6 +236,12 @@ const albumsSlice = createSlice({
       const currentFile = state.allFiles.find(
         (file) => file.filename === updatedFile.filename
       );
+
+      if (!currentFile) {
+        alert('error updating the file!');
+        return;
+      }
+
       const { updatedFileChangedFields } = getUpdatedFileChangedFields(
         updatedFile,
         currentFile

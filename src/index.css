@@ -49,3 +49,8 @@ a:hover, a:active, .link:hover, .link:active {
 .is-visible {
   opacity: 1;
 }
+
+input[type="checkbox"] {
+  transform: scale(2);
+  margin: 10px;
+}
