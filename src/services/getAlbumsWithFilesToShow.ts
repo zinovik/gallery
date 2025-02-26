@@ -47,8 +47,15 @@ export const getAlbumsWithFilesToShow = ({
         albumsWithFiles.length === 0 ||
         albumsWithFiles[albumsWithFiles.length - 1].album.path !== file.path
       ) {
+        const isNotFirstAlbum = albumsWithFiles.some(
+          ({ album }) => album.path === albumsByPathMap[file.path].path
+        );
+
         albumsWithFiles.push({
-          album: albumsByPathMap[file.path],
+          album: {
+            ...albumsByPathMap[file.path],
+            ...(isNotFirstAlbum ? { text: '' } : {}),
+          },
           files: [file],
         });
       } else {
