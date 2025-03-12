@@ -8,7 +8,7 @@ import { AdminChanges } from '../components/AdminChanges';
 import { ShowMode } from '../components/ShowMode';
 import { AdminLogin } from '../components/AdminLogin';
 import { Navigation } from '../components/Navigation';
-import { parseUrl } from '../services/utils';
+import { parseUrl, getShouldLoad } from '../services/utils';
 import {
   apiLoad,
   selectAllAlbums,
@@ -16,10 +16,9 @@ import {
   selectChanges,
   selectIsApiLoading,
   selectIsApiLogining,
-  selectShouldLoad,
-  setCurrentMainPath,
-  setIsShowingByDate,
-  setToken,
+  selectIsEverythingLoaded,
+  selectLoadedMainPaths,
+  setShowingProperties,
 } from '../app/stateSlices/allAlbumsAndFilesSlice';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { ScrollTo } from '../components/ScrollTo';
@@ -27,27 +26,45 @@ import { ScrollTo } from '../components/ScrollTo';
 export const MainRouter = () => {
   const dispatch = useAppDispatch();
 
-  const isApiLoading = useAppSelector(selectIsApiLoading);
-  const isApiLogining = useAppSelector(selectIsApiLogining);
-  const allAlbums = useAppSelector(selectAllAlbums);
-  const allFiles = useAppSelector(selectAllFiles);
-  const shouldLoad = useAppSelector(selectShouldLoad);
-  const changes = useAppSelector(selectChanges);
-
   const { currentPath, dateRanges, scrolledToFile, scrolledToAlbum, token } =
     parseUrl(useParams(), useSearchParams()[0], useLocation());
 
   useEffect(() => {
-    (async () => {
-      dispatch(setCurrentMainPath(currentPath));
-      dispatch(setIsShowingByDate(Boolean(dateRanges)));
-      dispatch(setToken(token));
+    dispatch(
+      setShowingProperties({
+        currentPath,
+        isShowingByDate: Boolean(dateRanges),
+        token,
+      })
+    );
+  }, [currentPath, dateRanges, token, dispatch]);
 
-      if (shouldLoad) {
+  const isEverythingLoaded = useAppSelector(selectIsEverythingLoaded);
+  const loadedMainPaths = useAppSelector(selectLoadedMainPaths);
+  const isApiLoading = useAppSelector(selectIsApiLoading);
+
+  const shouldLoad = useMemo(
+    () =>
+      getShouldLoad(
+        isEverythingLoaded,
+        loadedMainPaths,
+        currentPath.split('/')[0],
+        Boolean(dateRanges)
+      ),
+    [isEverythingLoaded, loadedMainPaths, currentPath, dateRanges]
+  );
+
+  useEffect(() => {
+    (async () => {
+      if (shouldLoad && !isApiLoading) {
         await dispatch(apiLoad(false));
       }
     })();
-  }, [currentPath, dateRanges, dispatch, shouldLoad, token]);
+  }, [shouldLoad, isApiLoading, dispatch]);
+
+  const allAlbums = useAppSelector(selectAllAlbums);
+  const allFiles = useAppSelector(selectAllFiles);
+  const changes = useAppSelector(selectChanges);
 
   const { albums, files } = useMemo(
     () =>
@@ -69,6 +86,8 @@ export const MainRouter = () => {
     [albums, files, currentPath, dateRanges]
   );
 
+  const isApiLogining = useAppSelector(selectIsApiLogining);
+
   return (
     <>
       <AdminChanges />
@@ -82,11 +101,11 @@ export const MainRouter = () => {
         </>
       )}
 
-      {(isApiLoading || isApiLogining) && (
+      {(isApiLoading || isApiLogining || shouldLoad) && (
         <main style={{ padding: '0.5rem' }}>⏳ Loading... Please wait</main>
       )}
 
-      {!isApiLoading && (
+      {!isApiLoading && !shouldLoad && (
         <>
           {albumsWithFilesToShow.length > 0 && (
             <>

@@ -49,7 +49,7 @@ const initialState: AllAlbumsAndFilesState = {
   token: '',
   tokenExpiresAt: 0,
   isShowingByDate: false,
-  isApiLoading: true,
+  isApiLoading: false,
   isApiLogining: true,
   allAlbums: [] as AlbumInterface[],
   allFiles: [] as FileInterface[],
@@ -78,14 +78,18 @@ const albumsSlice = createSlice({
   name: 'allAlbumsAndFiles',
   initialState,
   reducers: {
-    setCurrentMainPath: (state, action: PayloadAction<string>) => {
-      state.currentMainPath = action.payload.split('/')[0];
-    },
-    setIsShowingByDate: (state, action: PayloadAction<boolean>) => {
-      state.isShowingByDate = action.payload;
-    },
-    setToken: (state, action: PayloadAction<string>) => {
-      const token = action.payload;
+    setShowingProperties: (
+      state,
+      action: PayloadAction<{
+        currentPath: string;
+        isShowingByDate: boolean;
+        token: string;
+      }>
+    ) => {
+      state.currentMainPath = action.payload.currentPath.split('/')[0];
+      state.isShowingByDate = action.payload.isShowingByDate;
+
+      const token = action.payload.token;
 
       if (!token) {
         state.token = token;
@@ -328,8 +332,11 @@ const albumsSlice = createSlice({
       .addCase(apiLogin.rejected, (state) => {
         state.isApiLogining = false;
       })
-      .addCase(apiLogin.fulfilled, (_state, action) => {
-        const [isSuccess, csrf] = action.payload;
+      .addCase(apiLogin.fulfilled, (state, action) => {
+        const [isSuccess, csrf, user] = action.payload;
+
+        state.user = user;
+        state.isApiLogining = false;
 
         if (isSuccess) {
           localStorage.setItem('csrf', csrf);
@@ -341,7 +348,10 @@ const albumsSlice = createSlice({
       .addCase(apiLogout.rejected, (state) => {
         state.isApiLogining = false;
       })
-      .addCase(apiLogout.fulfilled, (_state, action) => {
+      .addCase(apiLogout.fulfilled, (state, action) => {
+        state.user = null;
+        state.isApiLogining = false;
+
         const isSuccess = action.payload;
 
         if (isSuccess) {
@@ -405,11 +415,11 @@ export const apiLoad = createAppAsyncThunk(
 export const apiLogin = createAppAsyncThunk(
   'allAlbumsAndFiles/apiLogin',
   async (googleToken: string) => {
-    const [{ csrf }, status] = await request('/auth/login', 'POST', {
+    const [{ csrf, user }, status] = await request('/auth/login', 'POST', {
       token: googleToken,
     });
 
-    return [status < 400, csrf];
+    return [status < 400, csrf, user];
   }
 );
 
@@ -438,9 +448,7 @@ export const apiEdit = createAppAsyncThunk(
 );
 
 export const {
-  setCurrentMainPath,
-  setToken,
-  setIsShowingByDate,
+  setShowingProperties,
   switchEditMode,
   addSelectedFile,
   removeSelectedFile,
@@ -464,22 +472,14 @@ export const selectAllAlbums = (state: RootState) =>
 export const selectAllFiles = (state: RootState) =>
   state.allAlbumsAndFiles.allFiles;
 
-export const selectShouldLoad = (state: RootState) => {
-  const {
-    allAlbumsAndFiles: {
-      isEverythingLoaded,
-      loadedMainPaths,
-      currentMainPath,
-      isShowingByDate,
-    },
-  } = state;
-
-  return (
-    !isEverythingLoaded &&
-    (!loadedMainPaths.includes(currentMainPath) ||
-      (currentMainPath === '' && isShowingByDate))
-  );
-};
+export const selectLoadedInfo = (state: RootState) => ({
+  isEverythingLoaded: state.allAlbumsAndFiles.isEverythingLoaded,
+  loadedMainPaths: state.allAlbumsAndFiles.loadedMainPaths,
+});
+export const selectIsEverythingLoaded = (state: RootState) =>
+  state.allAlbumsAndFiles.isEverythingLoaded;
+export const selectLoadedMainPaths = (state: RootState) =>
+  state.allAlbumsAndFiles.loadedMainPaths;
 
 export const selectUser = (state: RootState) => state.allAlbumsAndFiles.user;
 export const selectTokenExpiresAt = (state: RootState) =>

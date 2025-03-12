@@ -208,3 +208,16 @@ export const uniqueAlbums = (...args: AlbumInterface[][]): AlbumInterface[] => {
 
   return uniqueAlbums;
 };
+
+export const getShouldLoad = (
+  isEverythingLoaded: boolean,
+  loadedMainPaths: string[],
+  currentMainPath: string,
+  isShowingByDate: boolean
+): boolean => {
+  return (
+    !isEverythingLoaded &&
+    (!loadedMainPaths.includes(currentMainPath) ||
+      (currentMainPath === '' && isShowingByDate))
+  );
+};
