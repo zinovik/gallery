@@ -3,6 +3,7 @@ import {
   filterAlbumsByPath,
   filterFilesByPathAndDateRanges,
 } from './filtersByPathAndDateRanges';
+import { sortAlbums } from './sort';
 import { getAlbumsFromFiles, uniqueAlbums } from './utils';
 
 export const getAlbumsWithFilesToShow = ({
@@ -22,9 +23,8 @@ export const getAlbumsWithFilesToShow = ({
     dateRanges,
   });
 
-  const allAlbumsWithGenerated = uniqueAlbums(
-    allAlbums,
-    getAlbumsFromFiles(allFiles)
+  const allAlbumsWithGenerated = sortAlbums(
+    uniqueAlbums(allAlbums, getAlbumsFromFiles(allFiles))
   );
 
   const albums = filterAlbumsByPath({

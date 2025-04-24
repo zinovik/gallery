@@ -14,7 +14,7 @@ const getDatetimeFromFilename = (filename: string): string => {
 
   if (!Array.isArray(dateTimeParsed)) {
     const dateParsed = filename.match(
-      new RegExp('^([\\d]{4})([\\d]{2})([\\d]{2})_')
+      new RegExp('^([\\d]{4})([\\d]{2})([\\d]{2})')
     );
 
     if (!Array.isArray(dateParsed)) {
