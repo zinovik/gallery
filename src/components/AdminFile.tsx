@@ -147,7 +147,9 @@ export const AdminFile = ({ file }: Props) => {
         remove file
       </button>
 
-      {` accesses: ${file.accesses.join(', ')}`}
+      {` | ${file.accesses.includes('public') ? '🔴 ' : ''}${file.accesses.join(
+        ', '
+      )}`}
     </>
   );
 };

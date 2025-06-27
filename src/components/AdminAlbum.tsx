@@ -146,7 +146,9 @@ export const AdminAlbum = ({ album }: Props) => {
       >
         share
       </button>
-      {` ${album.path}; [${album.accesses.join(',')}]`}
+      {` ${album.path} | ${
+        album.accesses.includes('public') ? '🔴 ' : ''
+      }${album.accesses.join(',')}`}
       {album.order ? `; ${album.order}` : ''}
     </>
   );

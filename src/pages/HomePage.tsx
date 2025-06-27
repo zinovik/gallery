@@ -19,7 +19,13 @@ export const HomePage = ({ albums }: Props) => {
           <h2>
             <Link to={getLink(path, defaultByDate)}>{`${title} ${
               typeof filesAmount === 'number' ? ` (${filesAmount})` : ''
-            }${isEditModeEnabled ? ` [${accesses.join(', ')}]` : ''}`}</Link>
+            }${
+              isEditModeEnabled
+                ? ` | ${
+                    accesses.includes('public') ? '🔴 ' : ''
+                  }${accesses.join(', ')}`
+                : ''
+            }`}</Link>
           </h2>
         </div>
       ))}
