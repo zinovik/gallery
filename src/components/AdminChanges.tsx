@@ -25,19 +25,19 @@ export const AdminChanges = () => {
       )}
 
       {removedAlbums.map((album) => (
-        <div>{`Album REMOVE: ${JSON.stringify(album)}`}</div>
+        <div key={album.path}>{`Album REMOVE: ${JSON.stringify(album)}`}</div>
       ))}
       {removedFiles.map((file) => (
-        <div>{`File REMOVE: ${JSON.stringify(file)}`}</div>
+        <div key={file.filename}>{`File REMOVE: ${JSON.stringify(file)}`}</div>
       ))}
       {addedAlbums.map((album) => (
-        <div>{`Album ADD: ${JSON.stringify(album)}`}</div>
+        <div key={album.path}>{`Album ADD: ${JSON.stringify(album)}`}</div>
       ))}
       {updatedAlbums.map((album) => (
-        <div>{`Album UPDATE: ${JSON.stringify(album)}`}</div>
+        <div key={album.path}>{`Album UPDATE: ${JSON.stringify(album)}`}</div>
       ))}
       {updatedFiles.map((file) => (
-        <div>{`File UPDATE: ${JSON.stringify(file)}`}</div>
+        <div key={file.filename}>{`File UPDATE: ${JSON.stringify(file)}`}</div>
       ))}
 
       {(removedAlbums.length > 0 ||

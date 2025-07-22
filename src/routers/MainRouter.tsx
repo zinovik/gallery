@@ -16,8 +16,7 @@ import {
   selectChanges,
   selectIsApiLoading,
   selectIsApiLogining,
-  selectIsEverythingLoaded,
-  selectLoadedMainPaths,
+  selectLoadedPaths,
   setShowingProperties,
 } from '../app/stateSlices/allAlbumsAndFilesSlice';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
@@ -33,25 +32,18 @@ export const MainRouter = () => {
     dispatch(
       setShowingProperties({
         currentPath,
-        isShowingByDate: Boolean(dateRanges),
+        dateRanges,
         token,
       })
     );
   }, [currentPath, dateRanges, token, dispatch]);
 
-  const isEverythingLoaded = useAppSelector(selectIsEverythingLoaded);
-  const loadedMainPaths = useAppSelector(selectLoadedMainPaths);
+  const loadedPaths = useAppSelector(selectLoadedPaths);
   const isApiLoading = useAppSelector(selectIsApiLoading);
 
   const shouldLoad = useMemo(
-    () =>
-      getShouldLoad(
-        isEverythingLoaded,
-        loadedMainPaths,
-        currentPath.split('/')[0],
-        Boolean(dateRanges)
-      ),
-    [isEverythingLoaded, loadedMainPaths, currentPath, dateRanges]
+    () => getShouldLoad(loadedPaths, currentPath, dateRanges),
+    [loadedPaths, currentPath, dateRanges]
   );
 
   useEffect(() => {

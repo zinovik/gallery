@@ -15,9 +15,12 @@ import { createAppAsyncThunk } from '../withTypes';
 import { request } from '../../services/api/request';
 import { mapFilesDtoToFiles } from '../../services/api/mapFilesDtoToFiles';
 import {
+  convertDateRangesToParameterString,
+  getPathWithDateRanges,
   getUpdatedAlbumChangedFields,
   getUpdatedFileChangedFields,
   uniqueAlbums,
+  uniqueFiles,
 } from '../../services/utils';
 
 type User = {
@@ -27,16 +30,15 @@ type User = {
 };
 
 interface AllAlbumsAndFilesState {
-  currentMainPath: string;
+  currentPath: string;
+  dateRanges?: string[][];
   token: string;
   tokenExpiresAt: number;
-  isShowingByDate: boolean;
   isApiLoading: boolean;
   isApiLogining: boolean;
   allAlbums: AlbumInterface[];
   allFiles: FileInterface[];
-  loadedMainPaths: string[];
-  isEverythingLoaded: boolean;
+  loadedPaths: string[];
   user: User | null;
 
   isEditModeEnabled: boolean;
@@ -45,16 +47,15 @@ interface AllAlbumsAndFilesState {
 }
 
 const initialState: AllAlbumsAndFilesState = {
-  currentMainPath: '',
+  currentPath: '',
+  dateRanges: undefined,
   token: '',
   tokenExpiresAt: 0,
-  isShowingByDate: false,
   isApiLoading: false,
   isApiLogining: true,
   allAlbums: [] as AlbumInterface[],
   allFiles: [] as FileInterface[],
-  loadedMainPaths: [] as string[],
-  isEverythingLoaded: false,
+  loadedPaths: [] as string[],
   user: null as User | null,
 
   isEditModeEnabled: false,
@@ -82,12 +83,12 @@ const albumsSlice = createSlice({
       state,
       action: PayloadAction<{
         currentPath: string;
-        isShowingByDate: boolean;
+        dateRanges?: string[][];
         token: string;
       }>
     ) => {
-      state.currentMainPath = action.payload.currentPath.split('/')[0];
-      state.isShowingByDate = action.payload.isShowingByDate;
+      state.currentPath = action.payload.currentPath;
+      state.dateRanges = action.payload.dateRanges;
 
       const token = action.payload.token;
 
@@ -288,43 +289,38 @@ const albumsSlice = createSlice({
         state.isApiLoading = false;
         state.isApiLogining = false;
 
-        const { isReplace, isEverythingLoaded, albums, files, user } =
-          action.payload;
+        const { isReplace, albums, files, user } = action.payload;
 
-        // user
         state.user = user;
 
-        // loadedMainPaths
-        if (isReplace || isEverythingLoaded) {
-          state.loadedMainPaths = [];
+        if (isReplace) {
+          state.loadedPaths = [];
+          state.allAlbums = [];
+          state.allFiles = [];
         }
 
-        if (state.loadedMainPaths.includes(state.currentMainPath)) {
+        const pathWithDateRanges = getPathWithDateRanges(
+          state.currentPath,
+          state.dateRanges
+        );
+
+        if (state.loadedPaths.includes(pathWithDateRanges)) {
           return;
         }
 
-        if (state.currentMainPath) {
-          state.loadedMainPaths.push(state.currentMainPath);
+        if (!state.loadedPaths.includes('')) {
+          state.loadedPaths.push('');
         }
 
-        if (!state.loadedMainPaths.includes('')) {
-          state.loadedMainPaths.push('');
+        if (pathWithDateRanges) {
+          state.loadedPaths.push(pathWithDateRanges);
         }
 
-        if (isEverythingLoaded) {
-          state.isEverythingLoaded = isEverythingLoaded;
-        }
-
-        const allFiles = mapFilesDtoToFiles(files);
-
-        // albums and files
-        if (isReplace || isEverythingLoaded) {
-          state.allAlbums = albums;
-          state.allFiles = allFiles;
-        } else {
-          state.allAlbums = uniqueAlbums(state.allAlbums, albums);
-          state.allFiles.push(...allFiles);
-        }
+        state.allAlbums = uniqueAlbums(state.allAlbums, albums);
+        state.allFiles = uniqueFiles(
+          state.allFiles,
+          mapFilesDtoToFiles(files)
+        ).sort((f1, f2) => f1.filename.localeCompare(f2.filename));
       })
       .addCase(apiLogin.pending, (state) => {
         state.isApiLogining = true;
@@ -377,34 +373,36 @@ export const apiLoad = createAppAsyncThunk(
   'allAlbumsAndFiles/apiLoad',
   async (isReplace: boolean, { getState }) => {
     const {
-      allAlbumsAndFiles: { isShowingByDate, currentMainPath, allAlbums, token },
+      allAlbumsAndFiles: { dateRanges, currentPath, allAlbums, token },
     } = getState();
 
-    const shouldLoadEverything = isShowingByDate && currentMainPath === '';
-
-    const home = shouldLoadEverything
-      ? ''
-      : currentMainPath === ''
-      ? 'only'
-      : allAlbums.length === 0 || isReplace
-      ? 'include'
-      : '';
+    const home =
+      Boolean(dateRanges) && currentPath === ''
+        ? ''
+        : currentPath === ''
+        ? 'only'
+        : allAlbums.length === 0 || isReplace
+        ? 'include'
+        : '';
 
     const params = [
       { name: 'home', value: home },
       { name: 'token', value: token },
+      {
+        name: 'date-ranges',
+        value: convertDateRangesToParameterString(dateRanges || []),
+      },
     ]
-      .map((param) => (param.value ? `${param.name}=${param.value}` : ''))
-      .filter((param) => Boolean(param))
+      .filter((param) => Boolean(param.value))
+      .map((param) => `${param.name}=${param.value}`)
       .join('&');
 
     const [responseJson] = await request(
-      `/get/${currentMainPath ?? ''}${params ? `?${params}` : ''}`
+      `/get/${currentPath ?? ''}${params ? `?${params}` : ''}`
     );
 
     return {
       isReplace,
-      isEverythingLoaded: shouldLoadEverything,
       albums: responseJson.albums,
       files: responseJson.files,
       user: responseJson.user,
@@ -472,14 +470,8 @@ export const selectAllAlbums = (state: RootState) =>
 export const selectAllFiles = (state: RootState) =>
   state.allAlbumsAndFiles.allFiles;
 
-export const selectLoadedInfo = (state: RootState) => ({
-  isEverythingLoaded: state.allAlbumsAndFiles.isEverythingLoaded,
-  loadedMainPaths: state.allAlbumsAndFiles.loadedMainPaths,
-});
-export const selectIsEverythingLoaded = (state: RootState) =>
-  state.allAlbumsAndFiles.isEverythingLoaded;
-export const selectLoadedMainPaths = (state: RootState) =>
-  state.allAlbumsAndFiles.loadedMainPaths;
+export const selectLoadedPaths = (state: RootState) =>
+  state.allAlbumsAndFiles.loadedPaths;
 
 export const selectUser = (state: RootState) => state.allAlbumsAndFiles.user;
 export const selectTokenExpiresAt = (state: RootState) =>

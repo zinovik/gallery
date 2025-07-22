@@ -195,13 +195,13 @@ export const getAlbumsFromFiles = (
 
 export const uniqueAlbums = (...args: AlbumInterface[][]): AlbumInterface[] => {
   const uniqueAlbums: AlbumInterface[] = [];
+  const uniqueAlbumsPaths: string[] = [];
 
   args.forEach((albums) => {
-    const uniqueAlbumsPaths = uniqueAlbums.map((album) => album.path);
-
     albums.forEach((album: AlbumInterface) => {
       if (!uniqueAlbumsPaths.includes(album.path)) {
         uniqueAlbums.push(album);
+        uniqueAlbumsPaths.push(album.path);
       }
     });
   });
@@ -209,15 +209,55 @@ export const uniqueAlbums = (...args: AlbumInterface[][]): AlbumInterface[] => {
   return uniqueAlbums;
 };
 
+export const uniqueFiles = (...args: FileInterface[][]): FileInterface[] => {
+  const uniqueFiles: FileInterface[] = [];
+  const uniqueFilenames: string[] = [];
+
+  args.forEach((files) => {
+    files.forEach((file: FileInterface) => {
+      if (!uniqueFilenames.includes(file.filename)) {
+        uniqueFiles.push(file);
+        uniqueFilenames.push(file.filename);
+      }
+    });
+  });
+
+  return uniqueFiles;
+};
+
+export const convertDateRangesToParameterString = (
+  dateRanges: string[][]
+): string => `${dateRanges.map((dateRange) => dateRange.join('-')).join(',')}`;
+
+export const getPathWithDateRanges = (
+  path: string,
+  dateRanges?: string[][]
+): string =>
+  `${path}${
+    dateRanges &&
+    dateRanges.find((dateRange) => dateRange.find((date) => date !== ''))
+      ? `?${PARAMETER_DATE_RANGES}=${convertDateRangesToParameterString(
+          dateRanges
+        )}`
+      : ''
+  }`;
+
+export const isThisOrChildPath = (
+  childPath: string,
+  parentPath: string
+): boolean =>
+  childPath === parentPath || childPath.startsWith(`${parentPath}/`);
+
 export const getShouldLoad = (
-  isEverythingLoaded: boolean,
-  loadedMainPaths: string[],
-  currentMainPath: string,
-  isShowingByDate: boolean
+  loadedPaths: string[],
+  currentPath: string,
+  dateRanges?: string[][]
 ): boolean => {
-  return (
-    !isEverythingLoaded &&
-    (!loadedMainPaths.includes(currentMainPath) ||
-      (currentMainPath === '' && isShowingByDate))
+  const path = getPathWithDateRanges(currentPath, dateRanges);
+
+  // TODO: Check if dates are included in the loaded dates
+
+  return loadedPaths.every(
+    (loadedPath) => !isThisOrChildPath(path, loadedPath)
   );
 };

@@ -1,7 +1,5 @@
 import { AlbumInterface, FileInterface } from '../types';
-
-const isThisOrChildPath = (childPath: string, parentPath: string): boolean =>
-  childPath === parentPath || childPath.startsWith(`${parentPath}/`);
+import { isThisOrChildPath } from './utils';
 
 const isTopLevelPath = (path: string): boolean => !path.includes('/');
 
