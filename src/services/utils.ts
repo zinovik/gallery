@@ -243,10 +243,11 @@ export const getPathWithDateRanges = (
   }`;
 
 export const isThisOrChildPath = (
-  childPath: string,
-  parentPath: string
+  currentItemPath: string,
+  requiredPath: string
 ): boolean =>
-  childPath === parentPath || childPath.startsWith(`${parentPath}/`);
+  currentItemPath === requiredPath ||
+  currentItemPath.startsWith(`${requiredPath}/`);
 
 export const getShouldLoad = (
   loadedPaths: string[],
