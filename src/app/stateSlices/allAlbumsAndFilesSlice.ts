@@ -22,6 +22,7 @@ import {
   uniqueAlbums,
   uniqueFiles,
 } from '../../services/utils';
+import { checkIsCookieRestrictedBrowser } from '../../services/checkIsCookieRestrictedBrowser';
 
 type User = {
   email: string;
@@ -289,7 +290,14 @@ const albumsSlice = createSlice({
         state.isApiLoading = false;
         state.isApiLogining = false;
 
-        const { isReplace, albums, files, user } = action.payload;
+        const { isReplace, albums, files, user, accessToken } = action.payload;
+
+        if (
+          accessToken &&
+          checkIsCookieRestrictedBrowser(navigator.userAgent)
+        ) {
+          localStorage.setItem('access_token', accessToken);
+        }
 
         state.user = user;
 
@@ -329,12 +337,16 @@ const albumsSlice = createSlice({
         state.isApiLogining = false;
       })
       .addCase(apiLogin.fulfilled, (state, action) => {
-        const [isSuccess, csrf, user] = action.payload;
+        const [isSuccess, csrf, user, accessToken] = action.payload;
 
         state.user = user;
         state.isApiLogining = false;
 
-        if (isSuccess) {
+        if (!isSuccess) return;
+
+        if (checkIsCookieRestrictedBrowser(navigator.userAgent)) {
+          localStorage.setItem('access_token', accessToken);
+        } else {
           localStorage.setItem('csrf', csrf);
         }
       })
@@ -350,9 +362,13 @@ const albumsSlice = createSlice({
 
         const isSuccess = action.payload;
 
-        if (isSuccess) {
-          localStorage.removeItem('csrf');
-        }
+        if (!isSuccess) return;
+
+        localStorage.removeItem(
+          checkIsCookieRestrictedBrowser(navigator.userAgent)
+            ? 'access_token'
+            : 'csrf'
+        );
       })
       .addCase(apiEdit.fulfilled, (state, action) => {
         const isSuccess = action.payload;
@@ -406,6 +422,7 @@ export const apiLoad = createAppAsyncThunk(
       albums: responseJson.albums,
       files: responseJson.files,
       user: responseJson.user,
+      accessToken: responseJson.accessToken,
     };
   }
 );
@@ -413,11 +430,15 @@ export const apiLoad = createAppAsyncThunk(
 export const apiLogin = createAppAsyncThunk(
   'allAlbumsAndFiles/apiLogin',
   async (googleToken: string) => {
-    const [{ csrf, user }, status] = await request('/auth/login', 'POST', {
-      token: googleToken,
-    });
+    const [{ csrf, user, accessToken }, status] = await request(
+      '/auth/login',
+      'POST',
+      {
+        token: googleToken,
+      }
+    );
 
-    return [status < 400, csrf, user];
+    return [status < 400, csrf, user, accessToken];
   }
 );
 
