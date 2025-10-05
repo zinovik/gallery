@@ -27,13 +27,13 @@ export const AdminAlbum = ({ album }: Props) => {
     return null;
   }
 
-  if (album.title.startsWith('[') && album.title.endsWith(']')) {
-    return null;
-  }
+  const isRealAlbum =
+    !album.title.startsWith('[') || !album.title.endsWith(']');
 
   return (
     <>
       <button
+        disabled={!isRealAlbum}
         onClick={() => {
           const newPath = prompt('path', album.path);
           if (newPath === null) return;
@@ -106,6 +106,7 @@ export const AdminAlbum = ({ album }: Props) => {
         add album
       </button>
       <button
+        disabled={!isRealAlbum}
         onClick={() => {
           if (!window.confirm(`Remove ${album.path}?`)) return;
 
@@ -115,6 +116,7 @@ export const AdminAlbum = ({ album }: Props) => {
         remove album
       </button>
       <button
+        disabled={!isRealAlbum}
         onClick={() => {
           const newPath = prompt('path', album.path);
           if (newPath === null) return;
