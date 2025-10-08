@@ -21,6 +21,7 @@ import {
 } from '../app/stateSlices/allAlbumsAndFilesSlice';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { ScrollTo } from '../components/ScrollTo';
+import { Spinner } from '../components/Spinner';
 
 export const MainRouter = () => {
   const dispatch = useAppDispatch();
@@ -93,9 +94,7 @@ export const MainRouter = () => {
         </>
       )}
 
-      {(isApiLoading || isApiLogining || shouldLoad) && (
-        <main style={{ padding: '0.5rem' }}>⏳ Loading... Please wait</main>
-      )}
+      {(isApiLoading || isApiLogining || shouldLoad) && <Spinner />}
 
       {!isApiLoading && !shouldLoad && (
         <>
