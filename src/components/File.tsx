@@ -1,5 +1,5 @@
 import React from 'react';
-import LazyLoad from 'react-lazy-load';
+import { LazyLoad } from './LazyLoad';
 import { Image } from './Image';
 import { Video } from './Video';
 import { FileDescription } from './FileDescription';
