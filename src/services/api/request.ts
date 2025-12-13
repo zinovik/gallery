@@ -1,6 +1,10 @@
 import { API_URL } from '../../constants';
 
-export const request = async (path: string, method?: 'POST', body?: object) => {
+export const request = async (
+  path: string,
+  method?: 'POST',
+  body?: object
+): Promise<any | null> => {
   const response = await fetch(`${API_URL}${path}`, {
     method: method || 'GET',
     headers: {
@@ -11,7 +15,13 @@ export const request = async (path: string, method?: 'POST', body?: object) => {
     credentials: 'include', // DEPRECATED
   });
 
+  const accessToken = response.headers.get('access-token');
+
+  if (accessToken) {
+    localStorage.setItem('access_token', accessToken);
+  }
+
   const responseJson = await response.json();
 
-  return [responseJson, response.status];
+  return response.status < 400 ? responseJson : null;
 };

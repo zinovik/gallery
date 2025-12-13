@@ -132,14 +132,11 @@ export const AdminAlbum = ({ album }: Props) => {
           const expiresIn = prompt('expires in, h', '24');
           if (expiresIn === null) return;
 
-          const [responseJson, status] = await request(
+          const responseJson = await request(
             `/auth/share/${album.path}?expires_in_h=${expiresIn}`
           );
 
-          if (status >= 400) {
-            alert(responseJson.message || 'request error');
-            return;
-          }
+          if (!responseJson) return;
 
           searchParams.set(PARAMETER_TOKEN, responseJson.token);
           setSearchParams(searchParams);

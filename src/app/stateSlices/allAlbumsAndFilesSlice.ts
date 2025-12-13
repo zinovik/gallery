@@ -290,11 +290,7 @@ const albumsSlice = createSlice({
         state.isApiLoading = false;
         state.isApiLogining = false;
 
-        const { isReplace, albums, files, user, accessToken } = action.payload;
-
-        if (accessToken) {
-          localStorage.setItem('access_token', accessToken);
-        }
+        const { isReplace, albums, files, user } = action.payload;
 
         state.user = user;
 
@@ -334,14 +330,8 @@ const albumsSlice = createSlice({
         state.isApiLogining = false;
       })
       .addCase(apiLogin.fulfilled, (state, action) => {
-        const [isSuccess, user, accessToken] = action.payload;
-
-        state.user = user;
+        state.user = action.payload;
         state.isApiLogining = false;
-
-        if (!isSuccess) return;
-
-        localStorage.setItem('access_token', accessToken);
       })
       .addCase(apiLogout.pending, (state) => {
         state.isApiLogining = true;
@@ -402,16 +392,15 @@ export const apiLoad = createAppAsyncThunk(
       .map((param) => `${param.name}=${param.value}`)
       .join('&');
 
-    const [responseJson] = await request(
+    const responseJson = await request(
       `/get/${currentPath ?? ''}${params ? `?${params}` : ''}`
     );
 
     return {
       isReplace,
-      albums: responseJson.albums,
-      files: responseJson.files,
-      user: responseJson.user,
-      accessToken: responseJson.accessToken,
+      albums: responseJson?.albums ?? [],
+      files: responseJson?.files ?? [],
+      user: responseJson?.user ?? null,
     };
   }
 );
@@ -419,24 +408,20 @@ export const apiLoad = createAppAsyncThunk(
 export const apiLogin = createAppAsyncThunk(
   'allAlbumsAndFiles/apiLogin',
   async (googleToken: string) => {
-    const [{ user, accessToken }, status] = await request(
-      '/auth/login',
-      'POST',
-      {
-        token: googleToken,
-      }
-    );
+    const responseJson = await request('/auth/login', 'POST', {
+      token: googleToken,
+    });
 
-    return [status < 400, user, accessToken];
+    return responseJson?.user ?? null;
   }
 );
 
 export const apiLogout = createAppAsyncThunk(
   'allAlbumsAndFiles/apiLogout',
   async () => {
-    const [, status] = await request('/auth/logout', 'POST');
+    const responseJson = await request('/auth/logout', 'POST');
 
-    return status < 400;
+    return Boolean(responseJson);
   }
 );
 
@@ -445,13 +430,13 @@ export const apiEdit = createAppAsyncThunk(
   async (_payload, { getState }) => {
     const state = getState();
 
-    const [, status] = await request(
+    const responseJson = await request(
       '/edit',
       'POST',
       state.allAlbumsAndFiles.changes
     );
 
-    return status < 400;
+    return Boolean(responseJson);
   }
 );
 
