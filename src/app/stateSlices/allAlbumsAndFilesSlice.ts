@@ -22,7 +22,6 @@ import {
   uniqueAlbums,
   uniqueFiles,
 } from '../../services/utils';
-import { checkIsCookieRestrictedBrowser } from '../../services/checkIsCookieRestrictedBrowser';
 
 type User = {
   email: string;
@@ -292,10 +291,7 @@ const albumsSlice = createSlice({
 
         const { isReplace, albums, files, user, accessToken } = action.payload;
 
-        if (
-          accessToken &&
-          checkIsCookieRestrictedBrowser(navigator.userAgent)
-        ) {
+        if (accessToken) {
           localStorage.setItem('access_token', accessToken);
         }
 
@@ -337,18 +333,14 @@ const albumsSlice = createSlice({
         state.isApiLogining = false;
       })
       .addCase(apiLogin.fulfilled, (state, action) => {
-        const [isSuccess, csrf, user, accessToken] = action.payload;
+        const [isSuccess, user, accessToken] = action.payload;
 
         state.user = user;
         state.isApiLogining = false;
 
         if (!isSuccess) return;
 
-        if (checkIsCookieRestrictedBrowser(navigator.userAgent)) {
-          localStorage.setItem('access_token', accessToken);
-        } else {
-          localStorage.setItem('csrf', csrf);
-        }
+        localStorage.setItem('access_token', accessToken);
       })
       .addCase(apiLogout.pending, (state) => {
         state.isApiLogining = true;
@@ -364,11 +356,7 @@ const albumsSlice = createSlice({
 
         if (!isSuccess) return;
 
-        localStorage.removeItem(
-          checkIsCookieRestrictedBrowser(navigator.userAgent)
-            ? 'access_token'
-            : 'csrf'
-        );
+        localStorage.removeItem('access_token');
       })
       .addCase(apiEdit.fulfilled, (state, action) => {
         const isSuccess = action.payload;
@@ -430,7 +418,7 @@ export const apiLoad = createAppAsyncThunk(
 export const apiLogin = createAppAsyncThunk(
   'allAlbumsAndFiles/apiLogin',
   async (googleToken: string) => {
-    const [{ csrf, user, accessToken }, status] = await request(
+    const [{ user, accessToken }, status] = await request(
       '/auth/login',
       'POST',
       {
@@ -438,7 +426,7 @@ export const apiLogin = createAppAsyncThunk(
       }
     );
 
-    return [status < 400, csrf, user, accessToken];
+    return [status < 400, user, accessToken];
   }
 );
 
