@@ -1,4 +1,3 @@
-import React from 'react';
 import { AlbumInterface } from '../types';
 import {
   addAddedAlbum,

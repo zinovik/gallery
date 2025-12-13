@@ -1,4 +1,3 @@
-import React from 'react';
 import { Album } from '../components/Album';
 import { AgendaInterface, AlbumWithFiles } from '../types';
 import { Navigation } from '../components/Navigation';

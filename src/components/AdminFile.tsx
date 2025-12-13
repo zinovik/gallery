@@ -1,4 +1,3 @@
-import React from 'react';
 import { FileInterface } from '../types';
 import { useAppSelector } from '../app/hooks';
 import {

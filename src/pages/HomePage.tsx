@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { AlbumInterface } from '../types';
 import { getLink } from '../services/utils';

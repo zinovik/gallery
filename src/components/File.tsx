@@ -1,4 +1,3 @@
-import React from 'react';
 import { LazyLoad } from './LazyLoad';
 import { Image } from './Image';
 import { Video } from './Video';
@@ -53,9 +52,7 @@ export const File = ({ file, isCurrent }: Props) => {
           {type === FileType.image && (
             <Image url={thumbnailUrl} description={descriptionWithDatetime} />
           )}
-          {type === FileType.video && (
-            <Video url={thumbnailUrl} description={descriptionWithDatetime} />
-          )}
+          {type === FileType.video && <Video url={thumbnailUrl} />}
         </div>
       )}
 
@@ -72,11 +69,7 @@ export const File = ({ file, isCurrent }: Props) => {
               />
             )}
             {type === FileType.video && (
-              <Video
-                url={thumbnailUrl}
-                description={descriptionWithDatetime}
-                onClick={handleFileClick}
-              />
+              <Video url={thumbnailUrl} onClick={handleFileClick} />
             )}
           </div>
         </LazyLoad>

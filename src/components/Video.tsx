@@ -1,12 +1,9 @@
-import React from 'react';
-
 interface Props {
   url: string;
-  description: string;
   onClick?: () => void;
 }
 
-export const Video = ({ url, description, onClick }: Props) => {
+export const Video = ({ url, onClick }: Props) => {
   return (
     <>
       {onClick && (

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { formatDatetime } from '../services/utils';
 import { PARAMETER_DATE_RANGES } from '../constants';

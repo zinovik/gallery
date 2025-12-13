@@ -1,4 +1,3 @@
-import React from 'react';
 import { CredentialResponse, GoogleLogin } from '@react-oauth/google';
 import { IS_LOCAL_DEVELOPMENT } from '../constants';
 import {

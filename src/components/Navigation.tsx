@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { getLinks } from '../services/utils';
 import { selectAllAlbums } from '../app/stateSlices/allAlbumsAndFilesSlice';

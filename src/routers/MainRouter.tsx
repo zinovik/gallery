@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useParams, useSearchParams, useLocation } from 'react-router-dom';
 import { AlbumPage } from '../pages/AlbumPage';
 import { HomePage } from '../pages/HomePage';
