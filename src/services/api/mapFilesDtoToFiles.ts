@@ -1,11 +1,10 @@
-import { FileInterface, FileType } from '../../types';
+import type { FileInterface } from '../../types';
+import type { FileType } from '../../types';
 
 type FileDto = Omit<FileInterface, 'datetime' | 'type'>;
 
 const getFileType = (filename: string): FileType =>
-  ['mp4', 'mov'].includes(filename.split('.').pop() || '')
-    ? FileType.video
-    : FileType.image;
+  ['mp4', 'mov'].includes(filename.split('.').pop() || '') ? 'video' : 'image';
 
 const getDatetimeFromFilename = (filename: string): string => {
   const dateTimeParsed = filename.match(

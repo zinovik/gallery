@@ -1,4 +1,4 @@
-import { AlbumInterface } from '../types';
+import type { AlbumInterface } from '../types';
 import {
   addAddedAlbum,
   addRemovedAlbum,

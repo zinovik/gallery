@@ -1,4 +1,4 @@
-import { AlbumInterface, AlbumWithFiles, FileInterface } from '../types';
+import type { AlbumInterface, AlbumWithFiles, FileInterface } from '../types';
 import {
   filterAlbumsByPath,
   filterFilesByPathAndDateRanges,

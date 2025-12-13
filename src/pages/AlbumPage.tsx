@@ -1,5 +1,5 @@
 import { Album } from '../components/Album';
-import { AgendaInterface, AlbumWithFiles } from '../types';
+import type { AgendaInterface, AlbumWithFiles } from '../types';
 import { Navigation } from '../components/Navigation';
 import { useAppSelector } from '../app/hooks';
 import { selectAllAlbums } from '../app/stateSlices/allAlbumsAndFilesSlice';

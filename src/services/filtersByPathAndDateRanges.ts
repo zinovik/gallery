@@ -1,4 +1,4 @@
-import { AlbumInterface, FileInterface } from '../types';
+import type { AlbumInterface, FileInterface } from '../types';
 import { isThisOrChildPath } from './utils';
 
 const isTopLevelPath = (path: string): boolean => !path.includes('/');

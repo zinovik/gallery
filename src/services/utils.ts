@@ -1,7 +1,6 @@
-import {
+import type {
   AlbumInterface,
   FileInterface,
-  Host,
   UpdatedAlbum,
   UpdatedFile,
 } from '../types';
@@ -10,7 +9,7 @@ import {
   PARAMETER_FILE,
   PARAMETER_TOKEN,
 } from '../constants';
-import { Location, Params } from 'react-router-dom';
+import type { Location, Params } from 'react-router-dom';
 
 export const parseUrl = (
   params: Params<string>,
@@ -108,16 +107,6 @@ export const formatDatetime = (datetime?: string): string => {
   const timePart = ` ${hour}:${minute}`;
 
   return `${year ? datePart : ''}${hour && minute ? timePart : ''}`;
-};
-
-export const getThumbnail = (url: string, width: number): string => {
-  if (url.includes(Host.cloudinary)) {
-    const LEVEL = width < 400 ? '0.3' : '0.6';
-
-    return url.replace('/upload/v', `/upload/c_scale,h_${LEVEL},w_${LEVEL}/v`);
-  }
-
-  return url;
 };
 
 export const getUpdatedAlbumChangedFields = (

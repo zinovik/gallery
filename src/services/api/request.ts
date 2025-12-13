@@ -8,7 +8,7 @@ export const request = async (path: string, method?: 'POST', body?: object) => {
       ...(body ? { 'Content-Type': 'application/json' } : {}),
     },
     ...(body ? { body: JSON.stringify(body) } : {}),
-    credentials: 'include',
+    credentials: 'include', // DEPRECATED
   });
 
   const responseJson = await response.json();

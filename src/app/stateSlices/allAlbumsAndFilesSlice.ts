@@ -1,5 +1,6 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import {
+import { createSlice } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import type {
   AddedAlbum,
   AlbumInterface,
   Changes,
@@ -10,7 +11,7 @@ import {
   UpdatedAlbum,
   UpdatedFile,
 } from '../../types';
-import { RootState } from '../store';
+import type { RootState } from '../store';
 import { createAppAsyncThunk } from '../withTypes';
 import { request } from '../../services/api/request';
 import { mapFilesDtoToFiles } from '../../services/api/mapFilesDtoToFiles';

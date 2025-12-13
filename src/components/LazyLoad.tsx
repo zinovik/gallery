@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState, Suspense, ReactNode } from 'react';
+import React, { useEffect, useRef, useState, Suspense } from 'react';
+import type { ReactNode } from 'react';
 
 interface LazyLoadProps {
   children: ReactNode;

@@ -1,4 +1,4 @@
-import { AlbumInterface } from '../types';
+import type { AlbumInterface } from '../types';
 
 export const sortAlbums = (albums: AlbumInterface[]): AlbumInterface[] => {
   const topLevelPathsOriginalOrdered = albums

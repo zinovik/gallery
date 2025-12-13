@@ -3,7 +3,7 @@ import { Title } from './Title';
 import { Markdown } from './Markdown';
 import { File } from './File';
 import { Agenda } from './Agenda';
-import { AgendaInterface, AlbumInterface, AlbumWithFiles } from '../types';
+import type { AgendaInterface, AlbumInterface, AlbumWithFiles } from '../types';
 import { AdminAlbum } from './AdminAlbum';
 import { HashLink } from 'react-router-hash-link';
 import { getLevel } from '../services/utils';

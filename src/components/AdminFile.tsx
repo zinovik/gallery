@@ -1,4 +1,4 @@
-import { FileInterface } from '../types';
+import type { FileInterface } from '../types';
 import { useAppSelector } from '../app/hooks';
 import {
   addRemovedFile,

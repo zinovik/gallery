@@ -3,10 +3,10 @@ import { Image } from './Image';
 import { Video } from './Video';
 import { FileDescription } from './FileDescription';
 import { Markdown } from './Markdown';
-import { FileInterface, FileType } from '../types';
+import type { FileInterface } from '../types';
 import { useSearchParams } from 'react-router-dom';
 import { AdminFile } from './AdminFile';
-import { formatDatetime, getThumbnail } from '../services/utils';
+import { formatDatetime } from '../services/utils';
 
 interface Props {
   file: FileInterface;
@@ -14,10 +14,7 @@ interface Props {
 }
 
 export const File = ({ file, isCurrent }: Props) => {
-  const { url, type, isNoThumbnail, description, datetime, text } = file;
-  const thumbnailUrl = isNoThumbnail
-    ? url
-    : getThumbnail(url, window.innerWidth);
+  const { url, type, description, datetime, text } = file;
 
   const descriptionWithDatetime = `${description ? description : ''}${
     description && datetime ? ', ' : ''
@@ -49,10 +46,10 @@ export const File = ({ file, isCurrent }: Props) => {
             justifyContent: 'center',
           }}
         >
-          {type === FileType.image && (
-            <Image url={thumbnailUrl} description={descriptionWithDatetime} />
+          {type === 'image' && (
+            <Image url={url} description={descriptionWithDatetime} />
           )}
-          {type === FileType.video && <Video url={thumbnailUrl} />}
+          {type === 'video' && <Video url={url} />}
         </div>
       )}
 
@@ -61,16 +58,14 @@ export const File = ({ file, isCurrent }: Props) => {
 
         <LazyLoad offset={Math.min(window.innerWidth, 880) * 0.75}>
           <div style={{ textAlign: 'center' }}>
-            {type === FileType.image && (
+            {type === 'image' && (
               <Image
-                url={thumbnailUrl}
+                url={url}
                 description={descriptionWithDatetime}
                 onClick={handleFileClick}
               />
             )}
-            {type === FileType.video && (
-              <Video url={thumbnailUrl} onClick={handleFileClick} />
-            )}
+            {type === 'video' && <Video url={url} onClick={handleFileClick} />}
           </div>
         </LazyLoad>
 

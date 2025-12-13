@@ -1,5 +1,5 @@
-import { AlbumInterface } from './AlbumInterface';
-import { FileInterface } from './FileInterface';
+import type { AlbumInterface } from './AlbumInterface';
+import type { FileInterface } from './FileInterface';
 
 export interface AlbumWithFiles {
   album: AlbumInterface;
@@ -57,14 +57,7 @@ export interface Changes {
   };
 }
 
-export enum FileType {
-  image = 'image',
-  video = 'video',
-}
-
-export enum Host {
-  cloudinary = 'cloudinary.com',
-}
+export type FileType = 'image' | 'video';
 
 export * from './AlbumInterface';
 export * from './FileInterface';
