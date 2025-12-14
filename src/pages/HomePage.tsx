@@ -12,7 +12,7 @@ export const HomePage = ({ albums }: Props) => {
   const isEditModeEnabled = useAppSelector(selectIsEditModeEnabled);
 
   return (
-    <main>
+    <main style={{ paddingTop: '1.5rem' }}>
       {albums.map(({ title, path, filesAmount, defaultByDate, accesses }) => (
         <div key={path}>
           <h2>

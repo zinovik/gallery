@@ -3,6 +3,7 @@ import type { AgendaInterface, AlbumWithFiles } from '../types';
 import { Navigation } from '../components/Navigation';
 import { useAppSelector } from '../app/hooks';
 import { selectAllAlbums } from '../app/stateSlices/allAlbumsAndFilesSlice';
+import { Title } from '../components/Title';
 
 interface Props {
   albumsWithFiles: AlbumWithFiles[];
@@ -32,7 +33,11 @@ export const AlbumPage = ({
 
   return (
     <>
-      {albumsWithFiles.length > 0 && <Navigation albumPath={currentPath} />}
+      {albumsWithFiles.length > 0 && (
+        <Title level={4}>
+          <Navigation albumPath={currentPath} />
+        </Title>
+      )}
 
       <main>
         {albumsWithFiles.map((albumWithFiles, index) => (

@@ -30,6 +30,7 @@ export const AdminFile = ({ file }: Props) => {
     <>
       <input
         type="checkbox"
+        style={{ transform: 'scale(2)', margin: '10px', cursor: 'pointer' }}
         checked={selectedFiles.includes(file.filename)}
         onChange={(e) => {
           if (e.target.checked) {

@@ -27,6 +27,7 @@ export const Image = ({ url, description, onClick }: Props) => {
       onClick={onClick || (() => null)}
       onError={handleImageError}
       style={{
+        display: 'block',
         objectFit: 'contain',
         maxWidth: '100%',
         maxHeight: '100%',

@@ -17,7 +17,7 @@ body {
   margin: 0;
 }
 
-main, nav, p {
+main, nav {
   max-width: 55rem;
   margin-left: auto;
   margin-right: auto;
@@ -30,9 +30,6 @@ a:link, a:visited, .link {
 }
 a:hover, a:active, .link:hover, .link:active {
   color: #535bf2;
-}
-.link {
-  cursor: pointer;
 }
 
 button {
@@ -54,9 +51,13 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+h1, h2, h3, h4, p {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
 @media (max-width: 56rem){
-  h1, h2, h3, h4, p, nav {
-    padding: 0 0.5rem 0 0.5rem;
+  h1, h2, h3, h4, p {
+    padding: 0rem 0.5rem 0rem 0.5rem;
   }
 }
 
@@ -71,9 +72,4 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
-}
-
-input[type="checkbox"] {
-  transform: scale(2);
-  margin: 10px;
 }

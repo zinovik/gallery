@@ -26,7 +26,7 @@ export const Navigation = ({
   });
 
   return (
-    <nav style={{ textAlign: align || 'right', paddingTop: '1rem' }}>
+    <nav style={{ textAlign: align || 'right' }}>
       {links.map((link, index) => (
         <span key={link.url}>
           {index > 0 && ' | '}
