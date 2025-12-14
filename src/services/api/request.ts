@@ -12,7 +12,6 @@ export const request = async (
       ...(body ? { 'Content-Type': 'application/json' } : {}),
     },
     ...(body ? { body: JSON.stringify(body) } : {}),
-    credentials: 'include', // DEPRECATED
   });
 
   const accessToken = response.headers.get('access-token');
