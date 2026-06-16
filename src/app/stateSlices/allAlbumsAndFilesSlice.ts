@@ -106,7 +106,7 @@ const albumsSlice = createSlice({
 
         state.token = token;
         state.tokenExpiresAt = payload.exp * 1000;
-      } catch (error) {
+      } catch {
         console.error(`Invalid token: ${token}`);
       }
     },

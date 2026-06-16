@@ -1,10 +1,11 @@
 import { API_URL } from '../../constants';
 
-export const request = async (
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const request = async <T = any>(
   path: string,
   method?: 'POST',
   body?: object
-): Promise<any | null> => {
+): Promise<T | null> => {
   const response = await fetch(`${API_URL}${path}`, {
     method: method || 'GET',
     headers: {
