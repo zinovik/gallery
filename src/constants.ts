@@ -10,4 +10,4 @@ export const IS_LOCAL_DEVELOPMENT = process.env.NODE_ENV === 'development';
 
 export const API_URL = IS_LOCAL_DEVELOPMENT
   ? 'http://localhost:8080'
-  : 'https://gallery-api-306312319198.europe-central2.run.app';
+  : 'https://gallery-api-278546267214.europe-central2.run.app';
