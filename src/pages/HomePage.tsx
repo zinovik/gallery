@@ -21,8 +21,8 @@ export const HomePage = ({ albums }: Props) => {
             }${
               isEditModeEnabled
                 ? ` | ${
-                    accesses.includes('public') ? '🔴 ' : ''
-                  }${accesses.join(', ')}`
+                    accesses?.includes('public') ? '🔴 ' : ''
+                  }${accesses?.join(', ')}`
                 : ''
             }`}</Link>
           </h2>

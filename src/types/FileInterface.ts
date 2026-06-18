@@ -1,11 +1,13 @@
-export interface FileInterface {
-  path: string;
+export interface FileDTO {
   filename: string;
-  type: 'image' | 'video';
+  path: string;
   url: string;
-  datetime: string;
-  isNoThumbnail?: true;
   description?: string;
   text?: string | string[];
-  accesses: string[];
+  accesses?: string[];
+}
+
+export interface FileInterface extends FileDTO {
+  type: 'image' | 'video';
+  datetime: string;
 }

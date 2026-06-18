@@ -79,8 +79,8 @@ export const AdminFile = ({ file }: Props) => {
                   ? newTextString.split('---')
                   : newTextString,
                 accesses: newAccessesString.split(',').filter(Boolean),
-              })
-            )
+              }),
+            ),
           );
 
           dispatch(removeSelectedFile());
@@ -100,8 +100,8 @@ export const AdminFile = ({ file }: Props) => {
                 addUpdatedFile({
                   filename: filename,
                   path: newPath,
-                })
-              )
+                }),
+              ),
             );
 
             dispatch(removeSelectedFile());
@@ -122,8 +122,8 @@ export const AdminFile = ({ file }: Props) => {
                 addUpdatedFile({
                   filename: filename,
                   description: newDescription,
-                })
-              )
+                }),
+              ),
             );
 
             dispatch(removeSelectedFile());
@@ -140,15 +140,15 @@ export const AdminFile = ({ file }: Props) => {
           dispatch(
             addRemovedFile({
               filename: file.filename,
-            })
+            }),
           );
         }}
       >
         remove file
       </button>
 
-      {` | ${file.accesses.includes('public') ? '🔴 ' : ''}${file.accesses.join(
-        ', '
+      {` | ${file.accesses?.includes('public') ? '🔴 ' : ''}${file.accesses?.join(
+        ', ',
       )}`}
     </>
   );

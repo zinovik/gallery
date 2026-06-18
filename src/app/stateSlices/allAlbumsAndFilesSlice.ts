@@ -2,8 +2,10 @@ import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import type {
   AddedAlbum,
+  AlbumDTO,
   AlbumInterface,
   Changes,
+  FileDTO,
   FileInterface,
   NewAlbumPath,
   RemovedAlbum,
@@ -86,7 +88,7 @@ const albumsSlice = createSlice({
         currentPath: string;
         dateRanges?: string[][];
         token: string;
-      }>
+      }>,
     ) => {
       state.currentPath = action.payload.currentPath;
       state.dateRanges = action.payload.dateRanges;
@@ -122,7 +124,7 @@ const albumsSlice = createSlice({
     removeSelectedFile: (state, action: PayloadAction<string | undefined>) => {
       if (action.payload) {
         state.selectedFiles = state.selectedFiles.filter(
-          (selectedFile) => selectedFile !== action.payload
+          (selectedFile) => selectedFile !== action.payload,
         );
       } else {
         state.selectedFiles = [];
@@ -143,7 +145,7 @@ const albumsSlice = createSlice({
     addUpdatedAlbum: (state, action: PayloadAction<UpdatedAlbum>) => {
       const updatedAlbum = action.payload;
       const currentAlbum = state.allAlbums.find(
-        (album) => album.path === updatedAlbum.path
+        (album) => album.path === updatedAlbum.path,
       );
 
       if (!currentAlbum) {
@@ -169,7 +171,7 @@ const albumsSlice = createSlice({
             };
           }
           return alreadyUpdatedAlbum;
-        }
+        },
       );
 
       if (!isUpdated)
@@ -183,7 +185,7 @@ const albumsSlice = createSlice({
 
       const updatedAlbums = state.allAlbums
         .filter(
-          (album) => album.path === path || album.path.startsWith(`${path}/`)
+          (album) => album.path === path || album.path.startsWith(`${path}/`),
         )
         .map((album) => ({
           path: album.path,
@@ -197,21 +199,21 @@ const albumsSlice = createSlice({
       [...state.changes.update.albums, ...updatedAlbums].forEach(
         (updatedAlbum) => {
           const alreadyUpdatedAlbum = state.changes.update.albums.find(
-            (album) => (album.newPath || album.path) === updatedAlbum.path
+            (album) => (album.newPath || album.path) === updatedAlbum.path,
           );
 
           updatedAlbumsNew.push(
             alreadyUpdatedAlbum
               ? { ...alreadyUpdatedAlbum, ...updatedAlbum }
-              : updatedAlbum
+              : updatedAlbum,
           );
-        }
+        },
       );
       state.changes.update.albums = updatedAlbumsNew;
 
       const updatedFiles = state.allFiles
         .filter(
-          (file) => file.path === path || file.path.startsWith(`${path}/`)
+          (file) => file.path === path || file.path.startsWith(`${path}/`),
         )
         .map((file) => ({
           filename: file.filename,
@@ -225,22 +227,22 @@ const albumsSlice = createSlice({
       [...state.changes.update.files, ...updatedFiles].forEach(
         (updatedFile) => {
           const alreadyUpdatedFile = state.changes.update.files.find(
-            (file) => file.filename === updatedFile.filename
+            (file) => file.filename === updatedFile.filename,
           );
 
           updatedFilesNew.push(
             alreadyUpdatedFile
               ? { ...alreadyUpdatedFile, ...updatedFile }
-              : updatedFile
+              : updatedFile,
           );
-        }
+        },
       );
       state.changes.update.files = updatedFilesNew;
     },
     addUpdatedFile: (state, action: PayloadAction<UpdatedFile>) => {
       const updatedFile = action.payload;
       const currentFile = state.allFiles.find(
-        (file) => file.filename === updatedFile.filename
+        (file) => file.filename === updatedFile.filename,
       );
 
       if (!currentFile) {
@@ -250,7 +252,7 @@ const albumsSlice = createSlice({
 
       const { updatedFileChangedFields } = getUpdatedFileChangedFields(
         updatedFile,
-        currentFile
+        currentFile,
       );
 
       let isUpdated = false;
@@ -263,7 +265,7 @@ const albumsSlice = createSlice({
             return { ...alreadyUpdatedFile, ...updatedFileChangedFields };
           }
           return alreadyUpdatedFile;
-        }
+        },
       );
 
       if (!isUpdated) state.changes.update.files.push(updatedFileChangedFields);
@@ -302,7 +304,7 @@ const albumsSlice = createSlice({
 
         const pathWithDateRanges = getPathWithDateRanges(
           state.currentPath,
-          state.dateRanges
+          state.dateRanges,
         );
 
         if (state.loadedPaths.includes(pathWithDateRanges)) {
@@ -320,7 +322,7 @@ const albumsSlice = createSlice({
         state.allAlbums = uniqueAlbums(state.allAlbums, albums);
         state.allFiles = uniqueFiles(
           state.allFiles,
-          mapFilesDtoToFiles(files)
+          mapFilesDtoToFiles(files),
         ).sort((f1, f2) => f1.filename.localeCompare(f2.filename));
       })
       .addCase(apiLogin.pending, (state) => {
@@ -375,10 +377,10 @@ export const apiLoad = createAppAsyncThunk(
       Boolean(dateRanges) && currentPath === ''
         ? ''
         : currentPath === ''
-        ? 'only'
-        : allAlbums.length === 0 || isReplace
-        ? 'include'
-        : '';
+          ? 'only'
+          : allAlbums.length === 0 || isReplace
+            ? 'include'
+            : '';
 
     const params = [
       { name: 'home', value: home },
@@ -393,16 +395,16 @@ export const apiLoad = createAppAsyncThunk(
       .join('&');
 
     const responseJson = await request(
-      `/get/${currentPath ?? ''}${params ? `?${params}` : ''}`
+      `/get/${currentPath ?? ''}${params ? `?${params}` : ''}`,
     );
 
     return {
       isReplace,
-      albums: responseJson?.albums ?? [],
-      files: responseJson?.files ?? [],
+      albums: (responseJson?.albums ?? []) as AlbumDTO[],
+      files: (responseJson?.files ?? []) as FileDTO[],
       user: responseJson?.user ?? null,
     };
-  }
+  },
 );
 
 export const apiLogin = createAppAsyncThunk(
@@ -413,7 +415,7 @@ export const apiLogin = createAppAsyncThunk(
     });
 
     return responseJson?.user ?? null;
-  }
+  },
 );
 
 export const apiLogout = createAppAsyncThunk(
@@ -422,7 +424,7 @@ export const apiLogout = createAppAsyncThunk(
     const responseJson = await request('/auth/logout', 'POST');
 
     return Boolean(responseJson);
-  }
+  },
 );
 
 export const apiEdit = createAppAsyncThunk(
@@ -433,11 +435,11 @@ export const apiEdit = createAppAsyncThunk(
     const responseJson = await request(
       '/edit',
       'POST',
-      state.allAlbumsAndFiles.changes
+      state.allAlbumsAndFiles.changes,
     );
 
     return Boolean(responseJson);
-  }
+  },
 );
 
 export const {

@@ -14,7 +14,7 @@ import type { Location, Params } from 'react-router-dom';
 export const parseUrl = (
   params: Params<string>,
   searchParams: URLSearchParams,
-  location: Location
+  location: Location,
 ): {
   currentPath: string;
   dateRanges?: string[][];
@@ -46,9 +46,6 @@ export const parseUrl = (
 
 export const getLevel = (path: string): number => path.split('/').length;
 
-const generateAlbumTitleByPath = (path: string): string =>
-  `[ ${path.split('/').slice(-1).join('') || 'untitled'} ]`;
-
 export const getLink = (path: string, defaultByDate?: boolean) =>
   `/${path}${defaultByDate ? `?${PARAMETER_DATE_RANGES}=` : ''}`;
 
@@ -70,8 +67,9 @@ export const getLinks = ({
     const url = getLink(textPath);
 
     return {
-      text: album?.title || generateAlbumTitleByPath(url),
+      text: album?.title || 'not found',
       url,
+      ...(album ? {} : { isGenerateAlbum: true }),
     };
   });
 
@@ -111,7 +109,7 @@ export const formatDatetime = (datetime?: string): string => {
 
 export const getUpdatedAlbumChangedFields = (
   updatedAlbum: UpdatedAlbum,
-  currentAlbum: AlbumInterface
+  currentAlbum: AlbumInterface,
 ): {
   updatedAlbumChangedFields: Partial<AlbumInterface> & { path: string };
   newPath?: string | null;
@@ -131,7 +129,7 @@ export const getUpdatedAlbumChangedFields = (
       ? { order: updatedAlbum.order }
       : {}),
     ...(updatedAlbum.accesses !== undefined &&
-    updatedAlbum.accesses.join(',') !== currentAlbum.accesses.join(',')
+    updatedAlbum.accesses.join(',') !== (currentAlbum.accesses ?? []).join(',')
       ? { accesses: updatedAlbum.accesses }
       : {}),
   };
@@ -144,7 +142,7 @@ export const getUpdatedAlbumChangedFields = (
 
 export const getUpdatedFileChangedFields = (
   updatedFile: UpdatedFile,
-  currentFile: FileInterface
+  currentFile: FileInterface,
 ): {
   updatedFileChangedFields: Partial<FileInterface> & { filename: string };
 } => {
@@ -162,7 +160,7 @@ export const getUpdatedFileChangedFields = (
       ? { text: updatedFile.text }
       : {}),
     ...(updatedFile.accesses !== undefined &&
-    updatedFile.accesses.join(',') !== currentFile.accesses.join(',')
+    updatedFile.accesses.join(',') !== (currentFile.accesses ?? []).join(',')
       ? {
           accesses: updatedFile.accesses,
         }
@@ -170,16 +168,6 @@ export const getUpdatedFileChangedFields = (
   };
 
   return { updatedFileChangedFields };
-};
-
-export const getAlbumsFromFiles = (
-  files: FileInterface[]
-): AlbumInterface[] => {
-  return [...new Set(files.map((file) => file.path))].map((path) => ({
-    title: generateAlbumTitleByPath(path),
-    path,
-    accesses: [],
-  }));
 };
 
 export const uniqueAlbums = (...args: AlbumInterface[][]): AlbumInterface[] => {
@@ -215,25 +203,25 @@ export const uniqueFiles = (...args: FileInterface[][]): FileInterface[] => {
 };
 
 export const convertDateRangesToParameterString = (
-  dateRanges: string[][]
+  dateRanges: string[][],
 ): string => `${dateRanges.map((dateRange) => dateRange.join('-')).join(',')}`;
 
 export const getPathWithDateRanges = (
   path: string,
-  dateRanges?: string[][]
+  dateRanges?: string[][],
 ): string =>
   `${path}${
     dateRanges &&
     dateRanges.find((dateRange) => dateRange.find((date) => date !== ''))
       ? `?${PARAMETER_DATE_RANGES}=${convertDateRangesToParameterString(
-          dateRanges
+          dateRanges,
         )}`
       : ''
   }`;
 
 export const isThisOrChildPath = (
   currentItemPath: string,
-  requiredPath: string
+  requiredPath: string,
 ): boolean =>
   currentItemPath === requiredPath ||
   currentItemPath.startsWith(`${requiredPath}/`);
@@ -241,13 +229,13 @@ export const isThisOrChildPath = (
 export const getShouldLoad = (
   loadedPaths: string[],
   currentPath: string,
-  dateRanges?: string[][]
+  dateRanges?: string[][],
 ): boolean => {
   const path = getPathWithDateRanges(currentPath, dateRanges);
 
   // TODO: Check if dates are included in the loaded dates
 
   return loadedPaths.every(
-    (loadedPath) => !isThisOrChildPath(path, loadedPath)
+    (loadedPath) => !isThisOrChildPath(path, loadedPath),
   );
 };

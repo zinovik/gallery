@@ -26,13 +26,9 @@ export const AdminAlbum = ({ album }: Props) => {
     return null;
   }
 
-  const isRealAlbum =
-    !album.title.startsWith('[') || !album.title.endsWith(']');
-
   return (
     <>
       <button
-        disabled={!isRealAlbum}
         onClick={() => {
           const newPath = prompt('path', album.path);
           if (newPath === null) return;
@@ -73,7 +69,7 @@ export const AdminAlbum = ({ album }: Props) => {
                 ? undefined
                 : Number(newOrderString),
               accesses: newAccessesString.split(',').filter(Boolean),
-            })
+            }),
           );
         }}
       >
@@ -98,14 +94,13 @@ export const AdminAlbum = ({ album }: Props) => {
                 ? textString.split('---')
                 : textString,
               accesses: accessesString.split(','),
-            })
+            }),
           );
         }}
       >
         add album
       </button>
       <button
-        disabled={!isRealAlbum}
         onClick={() => {
           if (!window.confirm(`Remove ${album.path}?`)) return;
 
@@ -115,7 +110,6 @@ export const AdminAlbum = ({ album }: Props) => {
         remove album
       </button>
       <button
-        disabled={!isRealAlbum}
         onClick={() => {
           const newPath = prompt('path', album.path);
           if (newPath === null) return;
@@ -133,7 +127,7 @@ export const AdminAlbum = ({ album }: Props) => {
           if (expiresIn === null) return;
 
           const responseJson = await request(
-            `/auth/share/${album.path}?expires_in_h=${expiresIn}`
+            `/auth/share/${album.path}?expires_in_h=${expiresIn}`,
           );
 
           if (!responseJson) return;
@@ -145,8 +139,8 @@ export const AdminAlbum = ({ album }: Props) => {
         share
       </button>
       {` ${album.path} | ${
-        album.accesses.includes('public') ? '🔴 ' : ''
-      }${album.accesses.join(',')}`}
+        album.accesses?.includes('public') ? '🔴 ' : ''
+      }${album.accesses?.join(',') ?? '[]'}`}
       {album.order ? `; ${album.order}` : ''}
     </>
   );

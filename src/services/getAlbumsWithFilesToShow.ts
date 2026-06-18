@@ -3,8 +3,6 @@ import {
   filterAlbumsByPath,
   filterFilesByPathAndDateRanges,
 } from './filtersByPathAndDateRanges';
-import { sortAlbums } from './sort';
-import { getAlbumsFromFiles, uniqueAlbums } from './utils';
 
 export const getAlbumsWithFilesToShow = ({
   allAlbums,
@@ -23,12 +21,8 @@ export const getAlbumsWithFilesToShow = ({
     dateRanges,
   });
 
-  const allAlbumsWithGenerated = sortAlbums(
-    uniqueAlbums(allAlbums, getAlbumsFromFiles(allFiles))
-  );
-
   const albums = filterAlbumsByPath({
-    albums: allAlbumsWithGenerated,
+    albums: allAlbums,
     currentPath,
     isShowingByDate: Boolean(dateRanges),
   });
@@ -48,7 +42,7 @@ export const getAlbumsWithFilesToShow = ({
         albumsWithFiles[albumsWithFiles.length - 1].album.path !== file.path
       ) {
         const isNotFirstAlbum = albumsWithFiles.some(
-          ({ album }) => album.path === albumsByPathMap[file.path].path
+          ({ album }) => album.path === albumsByPathMap[file.path].path,
         );
 
         albumsWithFiles.push({
