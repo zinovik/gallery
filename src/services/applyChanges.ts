@@ -12,7 +12,7 @@ import { sortAlbums } from './sort';
 
 const removeAlbums = (
   albums: AlbumInterface[],
-  removedAlbums: RemovedAlbum[]
+  removedAlbums: RemovedAlbum[],
 ): AlbumInterface[] => {
   if (removedAlbums.length === 0) return albums;
 
@@ -23,7 +23,7 @@ const removeAlbums = (
 
 const removeFiles = (
   files: FileInterface[],
-  removedFiles: RemovedFile[]
+  removedFiles: RemovedFile[],
 ): FileInterface[] => {
   if (removedFiles.length === 0) return files;
 
@@ -34,7 +34,7 @@ const removeFiles = (
 
 const addAlbums = (
   albums: AlbumInterface[],
-  addedAlbums: AddedAlbum[]
+  addedAlbums: AddedAlbum[],
 ): AlbumInterface[] => {
   if (addedAlbums.length === 0) return albums;
 
@@ -54,13 +54,13 @@ const addAlbums = (
 
 const updateAlbums = (
   albums: AlbumInterface[],
-  updatedAlbums: UpdatedAlbum[]
+  updatedAlbums: UpdatedAlbum[],
 ): AlbumInterface[] => {
   if (updatedAlbums.length === 0) return albums;
 
   const albumsWithUpdated = albums.map((album) => {
     const updatedAlbum = updatedAlbums.find(
-      (updatedAlbum) => updatedAlbum.path === album.path
+      (updatedAlbum) => updatedAlbum.path === album.path,
     );
 
     if (!updatedAlbum) return album;
@@ -82,7 +82,7 @@ const updateFiles = (files: FileInterface[], updatedFiles: UpdatedFile[]) => {
 
   const filesWithUpdated = files.map((file) => {
     const updatedFile = updatedFiles.find(
-      (updatedFile) => updatedFile.filename === file.filename
+      (updatedFile) => updatedFile.filename === file.filename,
     );
 
     if (!updatedFile) return file;

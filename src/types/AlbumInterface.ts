@@ -6,6 +6,7 @@ export interface AlbumDTO {
   defaultByDate?: true;
   order?: number;
   accesses?: string[];
+  isDb?: true;
 }
 
 export interface AlbumInterface extends AlbumDTO {

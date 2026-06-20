@@ -5,6 +5,7 @@ export interface FileDTO {
   description?: string;
   text?: string | string[];
   accesses?: string[];
+  isDb?: true;
 }
 
 export interface FileInterface extends FileDTO {

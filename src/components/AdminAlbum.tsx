@@ -90,10 +90,16 @@ export const AdminAlbum = ({ album }: Props) => {
             addAddedAlbum({
               path,
               title,
-              text: textString.includes('---')
-                ? textString.split('---')
-                : textString,
-              accesses: accessesString.split(','),
+              ...(textString
+                ? {
+                    text: textString.includes('---')
+                      ? textString.split('---')
+                      : textString,
+                  }
+                : {}),
+              ...(accessesString
+                ? { accesses: accessesString.split(',') }
+                : {}),
             }),
           );
         }}
