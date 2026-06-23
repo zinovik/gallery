@@ -25,6 +25,7 @@ import {
   uniqueAlbums,
   uniqueFiles,
 } from '../../services/utils';
+import { sortAlbums, sortFiles } from '../../services/sort';
 
 type User = {
   email: string;
@@ -319,11 +320,13 @@ const albumsSlice = createSlice({
           state.loadedPaths.push(pathWithDateRanges);
         }
 
-        state.allAlbums = uniqueAlbums(state.allAlbums, albums);
-        state.allFiles = uniqueFiles(
+        state.allFiles = sortFiles(
+          uniqueFiles(state.allFiles, mapFilesDtoToFiles(files)),
+        );
+        state.allAlbums = sortAlbums(
+          uniqueAlbums(state.allAlbums, albums),
           state.allFiles,
-          mapFilesDtoToFiles(files),
-        ).sort((f1, f2) => f1.filename.localeCompare(f2.filename));
+        );
       })
       .addCase(apiLogin.pending, (state) => {
         state.isApiLogining = true;
