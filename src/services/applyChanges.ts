@@ -1,5 +1,6 @@
 import type {
   AddedAlbum,
+  AddedFile,
   AlbumInterface,
   Changes,
   FileInterface,
@@ -50,6 +51,33 @@ const addAlbums = (
   });
 
   return albumsWithAdded;
+};
+
+const addFiles = (
+  files: FileInterface[],
+  addedFiles: AddedFile[],
+): FileInterface[] => {
+  if (addedFiles.length === 0) return files;
+
+  const currentFilesMap: Record<string, FileInterface> = {};
+  files.forEach((file) => {
+    currentFilesMap[file.filename] = file;
+  });
+
+  const addedFilesMap: Record<string, AddedFile> = {};
+  addedFiles.forEach((file) => {
+    addedFilesMap[file.filename] = file;
+  });
+
+  return files.map((file) =>
+    addedFilesMap[file.filename]
+      ? {
+          ...currentFilesMap[file.filename],
+          ...addedFilesMap[file.filename],
+          isDb: true as const,
+        }
+      : file,
+  );
 };
 
 const updateAlbums = (
@@ -107,7 +135,7 @@ export const applyChanges = ({
 }) => {
   const {
     remove: { albums: removedAlbums, files: removedFiles },
-    add: { albums: addedAlbums },
+    add: { albums: addedAlbums, files: addedFiles },
     update: { albums: updatedAlbums, files: updatedFiles },
   } = changes;
 
@@ -115,6 +143,7 @@ export const applyChanges = ({
     removedAlbums.length === 0 &&
     removedFiles.length === 0 &&
     addedAlbums.length === 0 &&
+    addedFiles.length === 0 &&
     updatedAlbums.length === 0 &&
     updatedFiles.length === 0
   )
@@ -124,9 +153,13 @@ export const applyChanges = ({
   const filesWithoutRemoved = removeFiles(allFiles, removedFiles);
 
   const albumsWithAdded = addAlbums(albumsWithoutRemoved, addedAlbums);
+  const filesWithAdded = addFiles(filesWithoutRemoved, addedFiles);
 
   const albumsWithUpdated = updateAlbums(albumsWithAdded, updatedAlbums);
-  const filesWithUpdated = updateFiles(filesWithoutRemoved, updatedFiles);
+  const filesWithUpdated = updateFiles(filesWithAdded, updatedFiles);
 
-  return { albums: sortAlbums(albumsWithUpdated), files: filesWithUpdated };
+  return {
+    albums: sortAlbums(albumsWithUpdated, filesWithUpdated),
+    files: filesWithUpdated,
+  };
 };

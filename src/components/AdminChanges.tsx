@@ -13,7 +13,7 @@ export const AdminChanges = () => {
   const selectedFiles = useAppSelector(selectSelectedFiles);
   const {
     remove: { albums: removedAlbums, files: removedFiles },
-    add: { albums: addedAlbums },
+    add: { albums: addedAlbums, files: addedFiles },
     update: { albums: updatedAlbums, files: updatedFiles },
   } = useAppSelector(selectChanges);
 
@@ -32,6 +32,9 @@ export const AdminChanges = () => {
       {addedAlbums.map((album) => (
         <div key={album.path}>{`Album ADD: ${JSON.stringify(album)}`}</div>
       ))}
+      {addedFiles.map((file) => (
+        <div key={file.filename}>{`File ADD: ${JSON.stringify(file)}`}</div>
+      ))}
       {updatedAlbums.map((album) => (
         <div key={album.path}>{`Album UPDATE: ${JSON.stringify(album)}`}</div>
       ))}
@@ -42,6 +45,7 @@ export const AdminChanges = () => {
       {(removedAlbums.length > 0 ||
         removedFiles.length > 0 ||
         addedAlbums.length > 0 ||
+        addedFiles.length > 0 ||
         updatedAlbums.length > 0 ||
         updatedFiles.length > 0 ||
         selectedFiles.length > 0) && (

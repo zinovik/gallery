@@ -13,6 +13,11 @@ export interface AddedAlbum {
   accesses?: string[];
 }
 
+export interface AddedFile {
+  filename: string;
+  path: string;
+}
+
 export interface UpdatedAlbum {
   path: string;
   newPath?: string;
@@ -50,6 +55,7 @@ export interface Changes {
   };
   add: {
     albums: AddedAlbum[];
+    files: AddedFile[];
   };
   update: {
     albums: UpdatedAlbum[];

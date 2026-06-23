@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import type {
   AddedAlbum,
+  AddedFile,
   AlbumDTO,
   AlbumInterface,
   Changes,
@@ -71,6 +72,7 @@ const initialState: AllAlbumsAndFilesState = {
     },
     add: {
       albums: [] as AddedAlbum[],
+      files: [] as AddedFile[],
     },
     update: {
       albums: [] as UpdatedAlbum[],
@@ -142,6 +144,10 @@ const albumsSlice = createSlice({
     addAddedAlbum: (state, action: PayloadAction<AddedAlbum>) => {
       const addedAlbum = action.payload;
       state.changes.add.albums.push(addedAlbum);
+    },
+    addAddedFile: (state, action: PayloadAction<AddedFile>) => {
+      const addedFile = action.payload;
+      state.changes.add.files.push(addedFile);
     },
     addUpdatedAlbum: (state, action: PayloadAction<UpdatedAlbum>) => {
       const updatedAlbum = action.payload;
@@ -242,6 +248,29 @@ const albumsSlice = createSlice({
     },
     addUpdatedFile: (state, action: PayloadAction<UpdatedFile>) => {
       const updatedFile = action.payload;
+
+      const addedFile = state.changes.add.files.find(
+        (file) => file.filename === updatedFile.filename,
+      );
+
+      if (addedFile) {
+        const updatedFileChangedFields = getUpdatedFileChangedFields(
+          updatedFile,
+          addedFile,
+        );
+
+        state.changes.add.files = state.changes.add.files.map((file) =>
+          file.filename === updatedFile.filename
+            ? {
+                ...file,
+                ...updatedFileChangedFields,
+              }
+            : file,
+        );
+
+        return;
+      }
+
       const currentFile = state.allFiles.find(
         (file) => file.filename === updatedFile.filename,
       );
@@ -251,7 +280,7 @@ const albumsSlice = createSlice({
         return;
       }
 
-      const { updatedFileChangedFields } = getUpdatedFileChangedFields(
+      const updatedFileChangedFields = getUpdatedFileChangedFields(
         updatedFile,
         currentFile,
       );
@@ -275,6 +304,7 @@ const albumsSlice = createSlice({
       state.changes.remove.albums = [];
       state.changes.remove.files = [];
       state.changes.add.albums = [];
+      state.changes.add.files = [];
       state.changes.update.albums = [];
       state.changes.update.files = [];
       state.selectedFiles = [];
@@ -361,6 +391,7 @@ const albumsSlice = createSlice({
           state.changes.remove.albums = [];
           state.changes.remove.files = [];
           state.changes.add.albums = [];
+          state.changes.add.files = [];
           state.changes.update.albums = [];
           state.changes.update.files = [];
           state.selectedFiles = [];
@@ -453,6 +484,7 @@ export const {
   addRemovedAlbum,
   addRemovedFile,
   addAddedAlbum,
+  addAddedFile,
   addUpdatedAlbum,
   newAlbumPath,
   addUpdatedFile,

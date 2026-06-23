@@ -142,11 +142,9 @@ export const getUpdatedAlbumChangedFields = (
 
 export const getUpdatedFileChangedFields = (
   updatedFile: UpdatedFile,
-  currentFile: FileInterface,
-): {
-  updatedFileChangedFields: Partial<FileInterface> & { filename: string };
-} => {
-  const updatedFileChangedFields = {
+  currentFile: Partial<FileInterface> & { filename: string },
+): Partial<FileInterface> & { filename: string } => {
+  return {
     filename: updatedFile.filename,
     ...(updatedFile.path !== undefined && updatedFile.path !== currentFile.path
       ? { path: updatedFile.path }
@@ -166,8 +164,6 @@ export const getUpdatedFileChangedFields = (
         }
       : {}),
   };
-
-  return { updatedFileChangedFields };
 };
 
 export const uniqueAlbums = (...args: AlbumInterface[][]): AlbumInterface[] => {
