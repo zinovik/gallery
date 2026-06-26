@@ -1,14 +1,15 @@
-import type { AlbumInterface, FileInterface } from '../types';
-
 // Reused for every comparison instead of being recreated implicitly by each
 // localeCompare() call - this is the biggest win for large arrays, since
 // constructing collator state per comparison is expensive.
 const collator = new Intl.Collator();
 
-export const sortAlbums = (
-  albums: AlbumInterface[],
-  files: FileInterface[],
-): AlbumInterface[] => {
+export const sortAlbums = <
+  A extends { path: string; order?: number },
+  F extends { filename: string; path: string },
+>(
+  albums: A[],
+  files: F[],
+): A[] => {
   // For every top-level path, find the filename of the last file (in
   // original order) belonging to it. A single forward pass where later
   // files overwrite earlier map entries gives the same result as
@@ -101,5 +102,5 @@ export const sortAlbums = (
   });
 };
 
-export const sortFiles = (files: FileInterface[]): FileInterface[] =>
+export const sortFiles = <F extends { filename: string }>(files: F[]): F[] =>
   [...files].sort((f1, f2) => collator.compare(f1.filename, f2.filename));

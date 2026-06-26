@@ -8,14 +8,13 @@ export interface AlbumWithFiles {
 
 export interface AddedAlbum {
   path: string;
-  title: string;
+  title?: string;
   text?: string | string[];
   accesses?: string[];
 }
 
 export interface AddedFile {
   filename: string;
-  path: string;
 }
 
 export interface UpdatedAlbum {

@@ -29,6 +29,7 @@ export const AdminFile = ({ file }: Props) => {
 
   return (
     <>
+      {file.isDb && <>🛢️</>}
       {file.isDb ? (
         <>
           {' '}
@@ -153,7 +154,6 @@ export const AdminFile = ({ file }: Props) => {
             dispatch(
               addAddedFile({
                 filename: file.filename,
-                path: file.path,
               }),
             );
           }}
@@ -161,10 +161,13 @@ export const AdminFile = ({ file }: Props) => {
           add file
         </button>
       )}
-
-      {` | ${file.accesses?.includes('public') ? '🔴 ' : ''}${file.accesses?.join(
-        ', ',
-      )}`}
+      {file.resolvedAccesses?.includes('public') ||
+      file.accesses?.includes('public')
+        ? '🔴'
+        : ''}
+      resolved:
+      {file.resolvedAccesses?.join(',') ?? '-'};direct:
+      {file.accesses?.join(',') ?? '-'}
     </>
   );
 };

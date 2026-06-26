@@ -28,53 +28,57 @@ export const AdminAlbum = ({ album }: Props) => {
 
   return (
     <>
-      <button
-        onClick={() => {
-          const newPath = prompt('path', album.path);
-          if (newPath === null) return;
-          const newTitle = prompt('title', album.title);
-          if (newTitle === null) return;
-          const oldTextString =
-            (Array.isArray(album.text) ? album.text.join('---') : album.text) ??
-            '';
-          const newTextString = prompt('text', oldTextString);
-          if (newTextString === null) return;
-          const oldOrderString = album.order ? String(album.order) : '';
-          const newOrderString = prompt('order', oldOrderString);
-          if (newOrderString === null) return;
-          const oldAccessesString = album.accesses
-            ? album.accesses.join(',')
-            : '';
-          const newAccessesString = prompt('accesses', oldAccessesString);
-          if (newAccessesString === null) return;
+      {album.isDb && <>🛢️</>}
+      {album.isDb && (
+        <button
+          onClick={() => {
+            const newPath = prompt('path', album.path);
+            if (newPath === null) return;
+            const newTitle = prompt('title', album.title);
+            if (newTitle === null) return;
+            const oldTextString =
+              (Array.isArray(album.text)
+                ? album.text.join('---')
+                : album.text) ?? '';
+            const newTextString = prompt('text', oldTextString);
+            if (newTextString === null) return;
+            const oldOrderString = album.order ? String(album.order) : '';
+            const newOrderString = prompt('order', oldOrderString);
+            if (newOrderString === null) return;
+            const oldAccessesString = album.accesses
+              ? album.accesses.join(',')
+              : '';
+            const newAccessesString = prompt('accesses', oldAccessesString);
+            if (newAccessesString === null) return;
 
-          if (
-            newPath === album.path &&
-            newTitle === album.title &&
-            newTextString === oldTextString &&
-            newOrderString === oldOrderString &&
-            newAccessesString === oldAccessesString
-          )
-            return;
+            if (
+              newPath === album.path &&
+              newTitle === album.title &&
+              newTextString === oldTextString &&
+              newOrderString === oldOrderString &&
+              newAccessesString === oldAccessesString
+            )
+              return;
 
-          dispatch(
-            addUpdatedAlbum({
-              path: album.path,
-              newPath,
-              title: newTitle,
-              text: newTextString.includes('---')
-                ? newTextString.split('---')
-                : newTextString,
-              order: isNaN(Number(newOrderString))
-                ? undefined
-                : Number(newOrderString),
-              accesses: newAccessesString.split(',').filter(Boolean),
-            }),
-          );
-        }}
-      >
-        edit album
-      </button>
+            dispatch(
+              addUpdatedAlbum({
+                path: album.path,
+                newPath,
+                title: newTitle,
+                text: newTextString.includes('---')
+                  ? newTextString.split('---')
+                  : newTextString,
+                order: isNaN(Number(newOrderString))
+                  ? undefined
+                  : Number(newOrderString),
+                accesses: newAccessesString.split(',').filter(Boolean),
+              }),
+            );
+          }}
+        >
+          edit album
+        </button>
+      )}
       <button
         onClick={() => {
           const path = prompt('path', album.path);
@@ -89,7 +93,7 @@ export const AdminAlbum = ({ album }: Props) => {
           dispatch(
             addAddedAlbum({
               path,
-              title,
+              ...(title ? { title } : {}),
               ...(textString
                 ? {
                     text: textString.includes('---')
@@ -106,27 +110,32 @@ export const AdminAlbum = ({ album }: Props) => {
       >
         add album
       </button>
-      <button
-        onClick={() => {
-          if (!window.confirm(`Remove ${album.path}?`)) return;
+      {album.isDb && (
+        <>
+          <button
+            onClick={() => {
+              if (!window.confirm(`Remove ${album.path}?`)) return;
 
-          dispatch(addRemovedAlbum({ path: album.path }));
-        }}
-      >
-        remove album
-      </button>
-      <button
-        onClick={() => {
-          const newPath = prompt('path', album.path);
-          if (newPath === null) return;
+              dispatch(addRemovedAlbum({ path: album.path }));
+            }}
+          >
+            remove album
+          </button>
 
-          if (newPath === album.path) return;
+          <button
+            onClick={() => {
+              const newPath = prompt('path', album.path);
+              if (newPath === null) return;
 
-          dispatch(newAlbumPath({ path: album.path, newPath }));
-        }}
-      >
-        new path
-      </button>
+              if (newPath === album.path) return;
+
+              dispatch(newAlbumPath({ path: album.path, newPath }));
+            }}
+          >
+            new path
+          </button>
+        </>
+      )}
       <button
         onClick={async () => {
           const expiresIn = prompt('expires in, h', '24');
@@ -144,10 +153,14 @@ export const AdminAlbum = ({ album }: Props) => {
       >
         share
       </button>
-      {` ${album.path} | ${
-        album.accesses?.includes('public') ? '🔴 ' : ''
-      }${album.accesses?.join(',') ?? '[]'}`}
-      {album.order ? `; ${album.order}` : ''}
+      {album.resolvedAccesses?.includes('public') ||
+      album.accesses?.includes('public') ||
+      album.defaultAccesses?.includes('public')
+        ? '🔴'
+        : ''}
+      resolved:{album.resolvedAccesses?.join(',') ?? '-'};direct:
+      {album.accesses?.join(',') ?? '-'};default:
+      {album.defaultAccesses?.join(',') ?? '-'};{album.order}
     </>
   );
 };

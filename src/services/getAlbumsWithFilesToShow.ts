@@ -15,6 +15,9 @@ export const getAlbumsWithFilesToShow = ({
   currentPath: string;
   dateRanges?: string[][];
 }): AlbumWithFiles[] => {
+  const random = Math.random();
+  console.time(`getAlbumsWithFilesToShow ${random}`);
+
   const files = filterFilesByPathAndDateRanges({
     files: allFiles,
     currentPath,
@@ -62,8 +65,12 @@ export const getAlbumsWithFilesToShow = ({
 
   const albumsOrdered = currentPath === '' ? [...albums].reverse() : albums; // reverse order for home page (by albums)
 
-  return albumsOrdered.map((album) => ({
+  const result = albumsOrdered.map((album) => ({
     album,
     files: files.filter((file) => file.path === album.path),
   }));
+
+  console.timeEnd(`getAlbumsWithFilesToShow ${random}`);
+
+  return result;
 };

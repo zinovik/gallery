@@ -9,7 +9,7 @@ import type {
   UpdatedAlbum,
   UpdatedFile,
 } from '../types';
-import { sortAlbums } from './sort';
+import { sortAlbums, sortFiles } from './sort';
 
 const removeAlbums = (
   albums: AlbumInterface[],
@@ -39,14 +39,46 @@ const addAlbums = (
 ): AlbumInterface[] => {
   if (addedAlbums.length === 0) return albums;
 
-  const albumsWithAdded = [...albums];
+  const addedAlbumsMap = new Map<string, AddedAlbum>();
+  addedAlbums.forEach((album) => addedAlbumsMap.set(album.path, album));
+
+  const usedPaths = new Set<string>();
+  const albumsWithAdded: AlbumInterface[] = [];
+
+  albums.forEach((album) => {
+    const addedAlbum = addedAlbumsMap.get(album.path);
+    if (addedAlbum) {
+      console.log({
+        ...album,
+        ...addedAlbum,
+      });
+      albumsWithAdded.push({
+        ...album,
+        ...addedAlbum,
+        isDb: true,
+      });
+      usedPaths.add(album.path);
+    } else {
+      albumsWithAdded.push(album);
+    }
+  });
+
+  if (addedAlbums.length === usedPaths.size) return albumsWithAdded;
 
   addedAlbums.forEach((addedAlbum) => {
+    if (usedPaths.has(addedAlbum.path)) return;
+
     albumsWithAdded.push({
-      title: addedAlbum.title,
+      title:
+        addedAlbum.title ??
+        addedAlbum.path
+          .replace(/-/g, ' ')
+          .replace(/\b\w/g, (c) => c.toUpperCase()),
       text: addedAlbum.text || undefined,
       path: addedAlbum.path,
       accesses: addedAlbum.accesses,
+      resolvedAccesses: addedAlbum.accesses ?? [],
+      isDb: true,
     });
   });
 
@@ -160,6 +192,6 @@ export const applyChanges = ({
 
   return {
     albums: sortAlbums(albumsWithUpdated, filesWithUpdated),
-    files: filesWithUpdated,
+    files: sortFiles(filesWithUpdated),
   };
 };
