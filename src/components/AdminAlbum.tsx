@@ -42,6 +42,9 @@ export const AdminAlbum = ({ album }: Props) => {
                 : album.text) ?? '';
             const newTextString = prompt('text', oldTextString);
             if (newTextString === null) return;
+            const oldDefaultByDate = album.defaultByDate ? 'true' : undefined;
+            const newDefaultByDate = prompt('defaultByDate', oldDefaultByDate);
+            if (newDefaultByDate === null) return;
             const oldOrderString = album.order ? String(album.order) : '';
             const newOrderString = prompt('order', oldOrderString);
             if (newOrderString === null) return;
@@ -55,6 +58,7 @@ export const AdminAlbum = ({ album }: Props) => {
               newPath === album.path &&
               newTitle === album.title &&
               newTextString === oldTextString &&
+              newDefaultByDate === oldDefaultByDate &&
               newOrderString === oldOrderString &&
               newAccessesString === oldAccessesString
             )
@@ -68,6 +72,7 @@ export const AdminAlbum = ({ album }: Props) => {
                 text: newTextString.includes('---')
                   ? newTextString.split('---')
                   : newTextString,
+                defaultByDate: newDefaultByDate === 'true',
                 order: isNaN(Number(newOrderString))
                   ? undefined
                   : Number(newOrderString),

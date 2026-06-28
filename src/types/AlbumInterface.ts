@@ -4,7 +4,7 @@ export interface AlbumDTO {
   resolvedAccesses?: string[];
   text?: string | string[];
   filesAmount?: number;
-  defaultByDate?: true;
+  defaultByDate?: boolean;
   order?: number;
   accesses?: string[];
   defaultAccesses?: string[];

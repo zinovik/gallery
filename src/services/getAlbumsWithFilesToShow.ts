@@ -31,9 +31,9 @@ export const getAlbumsWithFilesToShow = ({
   });
 
   if (dateRanges) {
-    const albumsByPathMap: Record<string, AlbumInterface> = {};
+    const albumsByPathMap = new Map<string, AlbumInterface>();
     albums.forEach((album) => {
-      albumsByPathMap[album.path] = album;
+      albumsByPathMap.set(album.path, album);
     });
 
     const albumsWithFiles: AlbumWithFiles[] = [];
@@ -45,12 +45,14 @@ export const getAlbumsWithFilesToShow = ({
         albumsWithFiles[albumsWithFiles.length - 1].album.path !== file.path
       ) {
         const isNotFirstAlbum = albumsWithFiles.some(
-          ({ album }) => album.path === albumsByPathMap[file.path].path,
+          ({ album }) => album.path === albumsByPathMap.get(file.path)?.path,
         );
 
         albumsWithFiles.push({
           album: {
-            ...albumsByPathMap[file.path],
+            path: '', // for ts
+            title: '', // for ts
+            ...albumsByPathMap.get(file.path),
             ...(isNotFirstAlbum ? { text: '' } : {}),
           },
           files: [file],

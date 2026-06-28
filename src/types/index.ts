@@ -23,6 +23,7 @@ export interface UpdatedAlbum {
   title?: string;
   text?: string | string[];
   accesses?: string[];
+  defaultByDate?: boolean;
   order?: number;
 }
 

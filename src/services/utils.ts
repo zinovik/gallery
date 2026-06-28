@@ -111,7 +111,7 @@ export const getUpdatedAlbumChangedFields = (
   updatedAlbum: UpdatedAlbum,
   currentAlbum: AlbumInterface,
 ): {
-  updatedAlbumChangedFields: Partial<AlbumInterface> & { path: string };
+  updatedAlbumChangedFields: UpdatedAlbum;
   newPath?: string | null;
 } => {
   const updatedAlbumChangedFields = {
@@ -123,6 +123,10 @@ export const getUpdatedAlbumChangedFields = (
     ...(updatedAlbum.text !== undefined &&
     updatedAlbum.text !== (currentAlbum.text || '')
       ? { text: updatedAlbum.text }
+      : {}),
+    ...(updatedAlbum.defaultByDate !== undefined &&
+    updatedAlbum.defaultByDate !== currentAlbum.defaultByDate
+      ? { defaultByDate: updatedAlbum.defaultByDate }
       : {}),
     ...(updatedAlbum.order !== undefined &&
     updatedAlbum.order !== (currentAlbum.order || 0)
@@ -143,7 +147,7 @@ export const getUpdatedAlbumChangedFields = (
 export const getUpdatedFileChangedFields = (
   updatedFile: UpdatedFile,
   currentFile: Partial<FileInterface> & { filename: string },
-): Partial<FileInterface> & { filename: string } => {
+): UpdatedFile => {
   return {
     filename: updatedFile.filename,
     ...(updatedFile.path !== undefined && updatedFile.path !== currentFile.path
