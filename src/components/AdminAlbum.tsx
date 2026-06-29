@@ -88,27 +88,10 @@ export const AdminAlbum = ({ album }: Props) => {
         onClick={() => {
           const path = prompt('path', album.path);
           if (path === null) return;
-          const title = prompt('title');
-          if (title === null) return;
-          const textString = prompt('text');
-          if (textString === null) return;
-          const accessesString = prompt('accesses', 'public');
-          if (accessesString === null) return;
 
           dispatch(
             addAddedAlbum({
               path,
-              ...(title ? { title } : {}),
-              ...(textString
-                ? {
-                    text: textString.includes('---')
-                      ? textString.split('---')
-                      : textString,
-                  }
-                : {}),
-              ...(accessesString
-                ? { accesses: accessesString.split(',') }
-                : {}),
             }),
           );
         }}

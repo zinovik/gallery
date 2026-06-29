@@ -32,9 +32,7 @@ export const getAlbumsWithFilesToShow = ({
 
   if (dateRanges) {
     const albumsByPathMap = new Map<string, AlbumInterface>();
-    albums.forEach((album) => {
-      albumsByPathMap.set(album.path, album);
-    });
+    albums.forEach((album) => albumsByPathMap.set(album.path, album));
 
     const albumsWithFiles: AlbumWithFiles[] = [];
 
@@ -44,6 +42,7 @@ export const getAlbumsWithFilesToShow = ({
         albumsWithFiles.length === 0 ||
         albumsWithFiles[albumsWithFiles.length - 1].album.path !== file.path
       ) {
+        // the last album is different need to add an album (with text of without)
         const isNotFirstAlbum = albumsWithFiles.some(
           ({ album }) => album.path === albumsByPathMap.get(file.path)?.path,
         );
@@ -58,6 +57,7 @@ export const getAlbumsWithFilesToShow = ({
           files: [file],
         });
       } else {
+        // the last album is the save - just add the file
         albumsWithFiles[albumsWithFiles.length - 1].files.push(file);
       }
     });

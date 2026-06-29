@@ -7,7 +7,7 @@ export const Spinner = () => {
     const start = performance.now();
     const interval = setInterval(
       () => setElapsed((performance.now() - start) / 1000),
-      100
+      100,
     );
 
     return () => clearInterval(interval);
@@ -15,7 +15,7 @@ export const Spinner = () => {
 
   return (
     <main style={{ padding: '0.5rem' }}>
-      ⏳ Loading... Please wait - {elapsed.toFixed(1)}s
+      ⏳ Loading... Please wait - {elapsed.toFixed(1)}s {elapsed > 2 && '😴'}
     </main>
   );
 };
