@@ -10,11 +10,18 @@ export interface AddedAlbum {
   path: string;
   title?: string;
   text?: string | string[];
+  defaultByDate?: boolean;
+  order?: number;
   accesses?: string[];
+  defaultAccesses?: string[];
 }
 
 export interface AddedFile {
   filename: string;
+  path?: string;
+  description?: string;
+  text?: string | string[];
+  accesses?: string[];
 }
 
 export interface UpdatedAlbum {
@@ -22,9 +29,10 @@ export interface UpdatedAlbum {
   newPath?: string;
   title?: string;
   text?: string | string[];
-  accesses?: string[];
   defaultByDate?: boolean;
   order?: number;
+  accesses?: string[];
+  defaultAccesses?: string[];
 }
 
 export interface NewAlbumPath {

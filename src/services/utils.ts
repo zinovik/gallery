@@ -136,6 +136,11 @@ export const getUpdatedAlbumChangedFields = (
     updatedAlbum.accesses.join(',') !== (currentAlbum.accesses ?? []).join(',')
       ? { accesses: updatedAlbum.accesses }
       : {}),
+    ...(updatedAlbum.defaultAccesses !== undefined &&
+    updatedAlbum.defaultAccesses.join(',') !==
+      (currentAlbum.defaultAccesses ?? []).join(',')
+      ? { defaultAccesses: updatedAlbum.defaultAccesses }
+      : {}),
   };
 
   const newPath =

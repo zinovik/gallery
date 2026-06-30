@@ -53,6 +53,14 @@ export const AdminAlbum = ({ album }: Props) => {
               : '';
             const newAccessesString = prompt('accesses', oldAccessesString);
             if (newAccessesString === null) return;
+            const oldDefaultAccessesString = album.defaultAccesses
+              ? album.defaultAccesses.join(',')
+              : '';
+            const newDefaultAccessesString = prompt(
+              'defaultAccesses',
+              oldDefaultAccessesString,
+            );
+            if (newDefaultAccessesString === null) return;
 
             if (
               newPath === album.path &&
@@ -60,7 +68,8 @@ export const AdminAlbum = ({ album }: Props) => {
               newTextString === oldTextString &&
               newDefaultByDate === oldDefaultByDate &&
               newOrderString === oldOrderString &&
-              newAccessesString === oldAccessesString
+              newAccessesString === oldAccessesString &&
+              newDefaultAccessesString === oldDefaultAccessesString
             )
               return;
 
@@ -77,6 +86,9 @@ export const AdminAlbum = ({ album }: Props) => {
                   ? undefined
                   : Number(newOrderString),
                 accesses: newAccessesString.split(',').filter(Boolean),
+                defaultAccesses: newDefaultAccessesString
+                  .split(',')
+                  .filter(Boolean),
               }),
             );
           }}

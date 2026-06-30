@@ -164,6 +164,19 @@ const albumsSlice = createSlice({
         getUpdatedAlbumChangedFields(updatedAlbum, currentAlbum);
 
       let isUpdated = false;
+      state.changes.add.albums = state.changes.add.albums.map((addedAlbum) => {
+        if (addedAlbum.path === updatedAlbumChangedFields.path) {
+          isUpdated = true;
+          return {
+            ...addedAlbum,
+            ...updatedAlbumChangedFields,
+            ...(newPath ? { path: newPath } : {}),
+          };
+        }
+        return addedAlbum;
+      });
+      if (isUpdated) return;
+
       state.changes.update.albums = state.changes.update.albums.map(
         (alreadyUpdatedAlbum) => {
           if (
@@ -180,12 +193,12 @@ const albumsSlice = createSlice({
           return alreadyUpdatedAlbum;
         },
       );
+      if (isUpdated) return;
 
-      if (!isUpdated)
-        state.changes.update.albums.push({
-          ...updatedAlbumChangedFields,
-          ...(newPath ? { newPath } : {}),
-        });
+      state.changes.update.albums.push({
+        ...updatedAlbumChangedFields,
+        ...(newPath ? { newPath } : {}),
+      });
     },
     newAlbumPath: (state, action: PayloadAction<NewAlbumPath>) => {
       const { path, newPath } = action.payload;
