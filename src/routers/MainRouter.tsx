@@ -35,7 +35,7 @@ export const MainRouter = () => {
         currentPath,
         dateRanges,
         token,
-      })
+      }),
     );
   }, [currentPath, dateRanges, token, dispatch]);
 
@@ -44,15 +44,13 @@ export const MainRouter = () => {
 
   const shouldLoad = useMemo(
     () => getShouldLoad(loadedPaths, currentPath, dateRanges),
-    [loadedPaths, currentPath, dateRanges]
+    [loadedPaths, currentPath, dateRanges],
   );
 
   useEffect(() => {
-    (async () => {
-      if (shouldLoad && !isApiLoading) {
-        await dispatch(apiLoad(false));
-      }
-    })();
+    if (shouldLoad && !isApiLoading) {
+      dispatch(apiLoad(false));
+    }
   }, [shouldLoad, isApiLoading, dispatch]);
 
   const allAlbums = useAppSelector(selectAllAlbums);
@@ -66,7 +64,7 @@ export const MainRouter = () => {
         allFiles,
         changes,
       }),
-    [allAlbums, allFiles, changes]
+    [allAlbums, allFiles, changes],
   );
   const albumsWithFilesToShow = useMemo(
     () =>
@@ -76,7 +74,7 @@ export const MainRouter = () => {
         currentPath,
         dateRanges,
       }),
-    [albums, files, currentPath, dateRanges]
+    [albums, files, currentPath, dateRanges],
   );
 
   const isApiLogining = useAppSelector(selectIsApiLogining);
@@ -94,7 +92,7 @@ export const MainRouter = () => {
         </>
       )}
 
-      {(isApiLoading || isApiLogining || shouldLoad) && <Spinner />}
+      {(isApiLoading || isApiLogining) && <Spinner />}
 
       {!isApiLoading && !shouldLoad && (
         <>
@@ -103,7 +101,7 @@ export const MainRouter = () => {
               {!dateRanges && currentPath === '' ? (
                 <HomePage
                   albums={albumsWithFilesToShow.map(
-                    (albumWithFiles) => albumWithFiles.album
+                    (albumWithFiles) => albumWithFiles.album,
                   )}
                 />
               ) : (

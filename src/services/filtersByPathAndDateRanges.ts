@@ -1,7 +1,7 @@
 import type { AlbumInterface, FileInterface } from '../types';
 import { isThisOrChildPath } from './utils';
 
-const isTopLevelPath = (path: string): boolean => !path.includes('/');
+const isRootPath = (path: string): boolean => !path.includes('/');
 
 export const filterAlbumsByPath = ({
   albums,
@@ -14,8 +14,8 @@ export const filterAlbumsByPath = ({
 }): AlbumInterface[] => {
   return albums.filter((album) =>
     currentPath === ''
-      ? isShowingByDate || isTopLevelPath(album.path)
-      : isThisOrChildPath(album.path, currentPath)
+      ? isShowingByDate || isRootPath(album.path)
+      : isThisOrChildPath(album.path, currentPath),
   );
 };
 
@@ -38,7 +38,7 @@ export const filterFilesByPathAndDateRanges = ({
       !dateRanges.some(
         ([from, to]) =>
           (!from || file.datetime.slice(0, from.length) >= from) &&
-          (!to || file.datetime.slice(0, to.length) <= to)
+          (!to || file.datetime.slice(0, to.length) <= to),
       )
     ) {
       return false;

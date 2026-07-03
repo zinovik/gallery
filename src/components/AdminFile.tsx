@@ -10,6 +10,7 @@ import {
   selectSelectedFiles,
 } from '../app/stateSlices/allAlbumsAndFilesSlice';
 import { useDispatch } from 'react-redux';
+import { AdminAccesses } from './AdminAccesses';
 
 interface Props {
   file: FileInterface;
@@ -161,13 +162,10 @@ export const AdminFile = ({ file }: Props) => {
           add file
         </button>
       )}
-      {file.resolvedAccesses?.includes('public') ||
-      file.accesses?.includes('public')
-        ? '🔴'
-        : ''}
-      resolved:
-      {file.resolvedAccesses?.join(',') ?? '-'};direct:
-      {file.accesses?.join(',') ?? '-'}
+      <AdminAccesses
+        resolvedAccesses={file.resolvedAccesses}
+        accesses={file.accesses}
+      />
     </>
   );
 };

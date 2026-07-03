@@ -148,6 +148,7 @@ const albumsSlice = createSlice({
     addAddedFile: (state, action: PayloadAction<AddedFile>) => {
       const addedFile = action.payload;
       state.changes.add.files.push(addedFile);
+      state.selectedFiles.push(addedFile.filename);
     },
     addUpdatedAlbum: (state, action: PayloadAction<UpdatedAlbum>) => {
       const updatedAlbum = action.payload;

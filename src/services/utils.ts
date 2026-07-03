@@ -125,7 +125,7 @@ export const getUpdatedAlbumChangedFields = (
       ? { text: updatedAlbum.text }
       : {}),
     ...(updatedAlbum.defaultByDate !== undefined &&
-    updatedAlbum.defaultByDate !== currentAlbum.defaultByDate
+    Boolean(updatedAlbum.defaultByDate) !== Boolean(currentAlbum.defaultByDate)
       ? { defaultByDate: updatedAlbum.defaultByDate }
       : {}),
     ...(updatedAlbum.order !== undefined &&

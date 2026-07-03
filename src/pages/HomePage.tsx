@@ -3,6 +3,7 @@ import type { AlbumInterface } from '../types';
 import { getLink } from '../services/utils';
 import { useAppSelector } from '../app/hooks';
 import { selectIsEditModeEnabled } from '../app/stateSlices/allAlbumsAndFilesSlice';
+import { AdminAccesses } from '../components/AdminAccesses';
 
 interface Props {
   albums: AlbumInterface[];
@@ -26,22 +27,18 @@ export const HomePage = ({ albums }: Props) => {
         }) => (
           <div key={path}>
             <h2>
+              {isEditModeEnabled && isDb && '🛢️ '}
               <Link to={getLink(path, defaultByDate)}>{`${title} ${
                 typeof filesAmount === 'number' ? ` (${filesAmount})` : ''
               }`}</Link>
             </h2>
             {isEditModeEnabled && (
               <div style={{ padding: 0, margin: 0 }}>
-                {isDb && <>🛢️</>}
-                {resolvedAccesses?.includes('public') ||
-                accesses?.includes('public') ||
-                defaultAccesses?.includes('public')
-                  ? '🔴'
-                  : ''}
-                resolved:
-                {resolvedAccesses?.join(',') ?? '-'};direct:
-                {accesses?.join(',') ?? '-'};default:
-                {defaultAccesses?.join(',') ?? '-'}
+                <AdminAccesses
+                  resolvedAccesses={resolvedAccesses}
+                  accesses={accesses}
+                  defaultAccesses={defaultAccesses}
+                />
               </div>
             )}
           </div>

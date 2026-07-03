@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { request } from '../services/api/request';
 import { useSearchParams } from 'react-router-dom';
 import { PARAMETER_TOKEN } from '../constants';
+import { AdminAccesses } from './AdminAccesses';
 
 interface Props {
   album: AlbumInterface;
@@ -104,6 +105,7 @@ export const AdminAlbum = ({ album }: Props) => {
           dispatch(
             addAddedAlbum({
               path,
+              title: album.title,
             }),
           );
         }}
@@ -153,14 +155,12 @@ export const AdminAlbum = ({ album }: Props) => {
       >
         share
       </button>
-      {album.resolvedAccesses?.includes('public') ||
-      album.accesses?.includes('public') ||
-      album.defaultAccesses?.includes('public')
-        ? '🔴'
-        : ''}
-      resolved:{album.resolvedAccesses?.join(',') ?? '-'};direct:
-      {album.accesses?.join(',') ?? '-'};default:
-      {album.defaultAccesses?.join(',') ?? '-'};{album.order}
+      <AdminAccesses
+        resolvedAccesses={album.resolvedAccesses}
+        accesses={album.accesses}
+        defaultAccesses={album.defaultAccesses}
+      />
+      {album.order}
     </>
   );
 };
