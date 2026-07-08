@@ -20,7 +20,7 @@ export const AdminAccesses = ({
 
       {` (${accesses ? 'direct' : 'inherited'})`}
 
-      {defaultAccesses && `; default: ${defaultAccesses.join(',')}`}
+      {defaultAccesses && `, default: ${defaultAccesses.join(',')}`}
     </>
   );
 };

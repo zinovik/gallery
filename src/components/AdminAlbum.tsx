@@ -1,3 +1,4 @@
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import type { AlbumInterface } from '../types';
 import {
   addAddedAlbum,
@@ -8,7 +9,6 @@ import {
 } from '../app/stateSlices/allAlbumsAndFilesSlice';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { request } from '../services/api/request';
-import { useSearchParams } from 'react-router-dom';
 import { PARAMETER_TOKEN } from '../constants';
 import { AdminAccesses } from './AdminAccesses';
 
@@ -20,6 +20,7 @@ export const AdminAlbum = ({ album }: Props) => {
   const dispatch = useAppDispatch();
 
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const isEditModeEnabled = useAppSelector(selectIsEditModeEnabled);
 
@@ -132,6 +133,9 @@ export const AdminAlbum = ({ album }: Props) => {
               if (newPath === album.path) return;
 
               dispatch(newAlbumPath({ path: album.path, newPath }));
+              navigate(
+                `/${newPath}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`,
+              );
             }}
           >
             new path

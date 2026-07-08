@@ -33,13 +33,11 @@ export const HomePage = ({ albums }: Props) => {
               }`}</Link>
             </h2>
             {isEditModeEnabled && (
-              <div style={{ padding: 0, margin: 0 }}>
-                <AdminAccesses
-                  resolvedAccesses={resolvedAccesses}
-                  accesses={accesses}
-                  defaultAccesses={defaultAccesses}
-                />
-              </div>
+              <AdminAccesses
+                resolvedAccesses={resolvedAccesses}
+                accesses={accesses}
+                defaultAccesses={defaultAccesses}
+              />
             )}
           </div>
         ),
