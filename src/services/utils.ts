@@ -175,37 +175,28 @@ export const getUpdatedFileChangedFields = (
   };
 };
 
-export const uniqueAlbums = (...args: AlbumInterface[][]): AlbumInterface[] => {
-  const uniqueAlbums: AlbumInterface[] = [];
-  const uniqueAlbumsPaths: string[] = [];
+export const uniqueBy = <T>(items: T[], key: (item: T) => string): T[] => {
+  const seen = new Set<string>();
 
-  args.forEach((albums) => {
-    albums.forEach((album: AlbumInterface) => {
-      if (!uniqueAlbumsPaths.includes(album.path)) {
-        uniqueAlbums.push(album);
-        uniqueAlbumsPaths.push(album.path);
-      }
-    });
+  return items.filter((item) => {
+    const value = key(item);
+
+    if (seen.has(value)) {
+      return false;
+    }
+
+    seen.add(value);
+    return true;
   });
-
-  return uniqueAlbums;
 };
 
-export const uniqueFiles = (...args: FileInterface[][]): FileInterface[] => {
-  const uniqueFiles: FileInterface[] = [];
-  const uniqueFilenames: string[] = [];
+export const uniqueFiles = (
+  ...fileGroups: FileInterface[][]
+): FileInterface[] => uniqueBy(fileGroups.flat(), (file) => file.filename);
 
-  args.forEach((files) => {
-    files.forEach((file: FileInterface) => {
-      if (!uniqueFilenames.includes(file.filename)) {
-        uniqueFiles.push(file);
-        uniqueFilenames.push(file.filename);
-      }
-    });
-  });
-
-  return uniqueFiles;
-};
+export const uniqueAlbums = (
+  ...albumGroups: AlbumInterface[][]
+): AlbumInterface[] => uniqueBy(albumGroups.flat(), (album) => album.path);
 
 export const convertDateRangesToParameterString = (
   dateRanges: string[][],
