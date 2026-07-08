@@ -356,13 +356,7 @@ const albumsSlice = createSlice({
           return;
         }
 
-        if (!state.loadedPaths.includes('')) {
-          state.loadedPaths.push('');
-        }
-
-        if (pathWithDateRanges) {
-          state.loadedPaths.push(pathWithDateRanges);
-        }
+        state.loadedPaths.push(pathWithDateRanges);
 
         state.allFiles = sortFiles(
           uniqueFiles(state.allFiles, mapFilesDtoToFiles(files)),
@@ -418,20 +412,10 @@ export const apiLoad = createAppAsyncThunk(
   'allAlbumsAndFiles/apiLoad',
   async (isReplace: boolean, { getState }) => {
     const {
-      allAlbumsAndFiles: { dateRanges, currentPath, allAlbums, token },
+      allAlbumsAndFiles: { dateRanges, currentPath, token },
     } = getState();
 
-    const home =
-      Boolean(dateRanges) && currentPath === ''
-        ? ''
-        : currentPath === ''
-          ? 'only'
-          : allAlbums.length === 0 || isReplace
-            ? 'include'
-            : '';
-
     const params = [
-      { name: 'home', value: home },
       { name: 'token', value: token },
       {
         name: 'date-ranges',
