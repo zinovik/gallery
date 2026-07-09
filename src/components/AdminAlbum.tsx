@@ -164,7 +164,7 @@ export const AdminAlbum = ({ album }: Props) => {
         accesses={album.accesses}
         defaultAccesses={album.defaultAccesses}
       />
-      {album.order}
+      {album.order !== undefined ? ` [${album.order}]` : ''}
     </>
   );
 };

@@ -5,6 +5,7 @@ export interface FileDTO {
   resolvedAccesses?: string[];
   description?: string;
   text?: string | string[];
+  tags?: string[];
   accesses?: string[];
   isDb?: true;
 }
