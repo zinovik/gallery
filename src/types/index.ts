@@ -16,14 +16,6 @@ export interface AddedAlbum {
   defaultAccesses?: string[];
 }
 
-export interface AddedFile {
-  filename: string;
-  path?: string;
-  description?: string;
-  text?: string | string[];
-  accesses?: string[];
-}
-
 export interface UpdatedAlbum {
   path: string;
   newPath?: string;
@@ -45,6 +37,7 @@ export interface UpdatedFile {
   path?: string;
   description?: string;
   text?: string | string[];
+  tags?: string[];
   accesses?: string[];
 }
 
@@ -63,7 +56,6 @@ export interface Changes {
   };
   add: {
     albums: AddedAlbum[];
-    files: AddedFile[];
   };
   update: {
     albums: UpdatedAlbum[];

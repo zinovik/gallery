@@ -26,25 +26,32 @@ import { Spinner } from '../components/Spinner';
 export const MainRouter = () => {
   const dispatch = useAppDispatch();
 
-  const { currentPath, dateRanges, scrolledToFile, scrolledToAlbum, token } =
-    parseUrl(useParams(), useSearchParams()[0], useLocation());
+  const {
+    currentPath,
+    dateRanges,
+    tags,
+    scrolledToFile,
+    scrolledToAlbum,
+    token,
+  } = parseUrl(useParams(), useSearchParams()[0], useLocation());
 
   useEffect(() => {
     dispatch(
       setShowingProperties({
         currentPath,
         dateRanges,
+        tags,
         token,
       }),
     );
-  }, [currentPath, dateRanges, token, dispatch]);
+  }, [currentPath, dateRanges, tags, token, dispatch]);
 
   const loadedPaths = useAppSelector(selectLoadedPaths);
   const isApiLoading = useAppSelector(selectIsApiLoading);
 
   const shouldLoad = useMemo(
-    () => getShouldLoad(loadedPaths, currentPath, dateRanges),
-    [loadedPaths, currentPath, dateRanges],
+    () => getShouldLoad(loadedPaths, currentPath, dateRanges, tags),
+    [loadedPaths, currentPath, dateRanges, tags],
   );
 
   useEffect(() => {
@@ -73,8 +80,9 @@ export const MainRouter = () => {
         allFiles: files,
         currentPath,
         dateRanges,
+        tags,
       }),
-    [albums, files, currentPath, dateRanges],
+    [albums, files, currentPath, dateRanges, tags],
   );
 
   const isApiLogining = useAppSelector(selectIsApiLogining);

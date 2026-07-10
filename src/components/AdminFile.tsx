@@ -1,7 +1,6 @@
 import type { FileInterface } from '../types';
 import { useAppSelector } from '../app/hooks';
 import {
-  addAddedFile,
   addRemovedFile,
   addSelectedFile,
   addUpdatedFile,
@@ -30,140 +29,130 @@ export const AdminFile = ({ file }: Props) => {
 
   return (
     <>
-      {file.isDb && <>🛢️</>}
-      {file.isDb ? (
-        <>
-          {' '}
-          <input
-            type="checkbox"
-            style={{ transform: 'scale(2)', margin: '10px', cursor: 'pointer' }}
-            checked={selectedFiles.includes(file.filename)}
-            onChange={(e) => {
-              if (e.target.checked) {
-                dispatch(addSelectedFile(file.filename));
-              } else {
-                dispatch(removeSelectedFile(file.filename));
-              }
-            }}
-          />
-          <button
-            onClick={async () => {
-              const newPath = prompt('path', file.path);
-              if (newPath === null) return;
-              const newDescription = prompt('description', description ?? '');
-              if (newDescription === null) return;
-              const oldTextString =
-                (Array.isArray(text) ? text.join('---') : text) ?? '';
-              const newTextString = prompt('text', oldTextString);
-              if (newTextString === null) return;
-              const oldAccessesString = file.accesses
-                ? file.accesses.join(',')
-                : '';
-              const newAccessesString = prompt('accesses', oldAccessesString);
-              if (newAccessesString === null) return;
+      {' '}
+      <input
+        type="checkbox"
+        style={{ transform: 'scale(2)', margin: '10px', cursor: 'pointer' }}
+        checked={selectedFiles.includes(file.filename)}
+        onChange={(e) => {
+          if (e.target.checked) {
+            dispatch(addSelectedFile(file.filename));
+          } else {
+            dispatch(removeSelectedFile(file.filename));
+          }
+        }}
+      />
+      <button
+        onClick={async () => {
+          const filePath = file.resolved?.path ?? file.path ?? 'NOT RESOLVED';
 
-              if (
-                newPath === file.path &&
-                newDescription === (description ?? '') &&
-                newTextString === oldTextString &&
-                newAccessesString === oldAccessesString &&
-                selectedFiles.length === 0
-              )
-                return;
+          const newPath = prompt('path', filePath);
+          if (newPath === null) return;
+          const newDescription = prompt('description', description ?? '');
+          if (newDescription === null) return;
+          const oldTextString =
+            (Array.isArray(text) ? text.join('---') : text) ?? '';
+          const newTextString = prompt('text', oldTextString);
+          if (newTextString === null) return;
+          const oldTagsString = file.tags ? file.tags.join(',') : '';
+          const newTagsString = prompt('tags', oldTagsString);
+          if (newTagsString === null) return;
+          const oldAccessesString = file.accesses
+            ? file.accesses.join(',')
+            : '';
+          const newAccessesString = prompt('accesses', oldAccessesString);
+          if (newAccessesString === null) return;
 
-              const filenames =
-                selectedFiles.length > 0 ? selectedFiles : [file.filename];
+          if (
+            newPath === filePath &&
+            newDescription === (description ?? '') &&
+            newTextString === oldTextString &&
+            newTagsString === oldTagsString &&
+            newAccessesString === oldAccessesString &&
+            selectedFiles.length === 0
+          )
+            return;
 
-              filenames.forEach((filename) =>
-                dispatch(
-                  addUpdatedFile({
-                    filename: filename,
-                    path: newPath,
-                    description: newDescription,
-                    text: newTextString.includes('---')
-                      ? newTextString.split('---')
-                      : newTextString,
-                    accesses: newAccessesString.split(',').filter(Boolean),
-                  }),
-                ),
-              );
+          const filenames =
+            selectedFiles.length > 0 ? selectedFiles : [file.filename];
 
-              dispatch(removeSelectedFile());
-            }}
-          >
-            {selectedFiles.length > 0 ? 'edit selected files' : 'edit file'}
-          </button>
-          {selectedFiles.length > 0 && (
-            <button
-              onClick={async () => {
-                const newPath = prompt('path', file.path);
-                if (newPath === null) return;
-
-                selectedFiles.forEach((filename) =>
-                  dispatch(
-                    addUpdatedFile({
-                      filename: filename,
-                      path: newPath,
-                    }),
-                  ),
-                );
-
-                dispatch(removeSelectedFile());
-              }}
-            >
-              edit selected files path
-            </button>
-          )}
-          {selectedFiles.length > 0 && (
-            <button
-              onClick={async () => {
-                const newDescription = prompt('description', description ?? '');
-                if (newDescription === null) return;
-
-                selectedFiles.forEach((filename) =>
-                  dispatch(
-                    addUpdatedFile({
-                      filename: filename,
-                      description: newDescription,
-                    }),
-                  ),
-                );
-
-                dispatch(removeSelectedFile());
-              }}
-            >
-              edit selected files description
-            </button>
-          )}
-          <button
-            onClick={() => {
-              if (!window.confirm(`Remove ${file.filename}?`)) return;
-
-              dispatch(
-                addRemovedFile({
-                  filename: file.filename,
-                }),
-              );
-            }}
-          >
-            remove file
-          </button>
-        </>
-      ) : (
-        <button
-          onClick={() => {
+          filenames.forEach((filename) =>
             dispatch(
-              addAddedFile({
-                filename: file.filename,
+              addUpdatedFile({
+                filename: filename,
+                path: newPath,
+                description: newDescription,
+                text: newTextString.includes('---')
+                  ? newTextString.split('---')
+                  : newTextString,
+                tags: newTagsString.split(',').filter(Boolean),
+                accesses: newAccessesString.split(',').filter(Boolean),
               }),
+            ),
+          );
+
+          dispatch(removeSelectedFile());
+        }}
+      >
+        {selectedFiles.length > 0 ? 'edit selected files' : 'edit file'}
+      </button>
+      {selectedFiles.length > 0 && (
+        <button
+          onClick={async () => {
+            const newPath = prompt('path', file.path);
+            if (newPath === null) return;
+
+            selectedFiles.forEach((filename) =>
+              dispatch(
+                addUpdatedFile({
+                  filename: filename,
+                  path: newPath,
+                }),
+              ),
             );
+
+            dispatch(removeSelectedFile());
           }}
         >
-          add file
+          edit selected files path
         </button>
       )}
+      {selectedFiles.length > 0 && (
+        <button
+          onClick={async () => {
+            const newDescription = prompt('description', description ?? '');
+            if (newDescription === null) return;
+
+            selectedFiles.forEach((filename) =>
+              dispatch(
+                addUpdatedFile({
+                  filename: filename,
+                  description: newDescription,
+                }),
+              ),
+            );
+
+            dispatch(removeSelectedFile());
+          }}
+        >
+          edit selected files description
+        </button>
+      )}
+      <button
+        onClick={() => {
+          if (!window.confirm(`Remove ${file.filename}?`)) return;
+
+          dispatch(
+            addRemovedFile({
+              filename: file.filename,
+            }),
+          );
+        }}
+      >
+        remove file
+      </button>
       <AdminAccesses
-        resolvedAccesses={file.resolvedAccesses}
+        resolvedAccesses={file.resolved?.accesses}
         accesses={file.accesses}
       />
     </>

@@ -7,6 +7,7 @@ import type {
 import {
   PARAMETER_DATE_RANGES,
   PARAMETER_FILE,
+  PARAMETER_TAGS,
   PARAMETER_TOKEN,
 } from '../constants';
 import type { Location, Params } from 'react-router-dom';
@@ -18,6 +19,7 @@ export const parseUrl = (
 ): {
   currentPath: string;
   dateRanges?: string[][];
+  tags?: string[];
   token: string;
   scrolledToFile: string;
   scrolledToAlbum: string;
@@ -30,6 +32,9 @@ export const parseUrl = (
     ?.split(',')
     .map((dateRange) => dateRange.split('-'));
 
+  const tagsParameter = searchParams.get(PARAMETER_TAGS);
+  const tags = tagsParameter?.split(',');
+
   const scrolledToFile = searchParams.get(PARAMETER_FILE) ?? '';
   const scrolledToAlbum = location.hash.substring(1);
 
@@ -38,6 +43,7 @@ export const parseUrl = (
   return {
     currentPath,
     dateRanges,
+    tags,
     scrolledToFile,
     scrolledToAlbum,
     token,
@@ -66,8 +72,10 @@ export const getLinks = ({
     const album = allAlbums.find((album) => album.path === textPath);
     const url = getLink(textPath);
 
+    const albumTitle = album?.resolved?.title ?? album?.title ?? 'NOT RESOLVED';
+
     return {
-      text: album?.title || 'not found',
+      text: albumTitle,
       url,
       ...(album ? {} : { isGenerateAlbum: true }),
     };
@@ -114,10 +122,13 @@ export const getUpdatedAlbumChangedFields = (
   updatedAlbumChangedFields: UpdatedAlbum;
   newPath?: string | null;
 } => {
+  const currentAlbumTitle =
+    currentAlbum.resolved?.title ?? currentAlbum.title ?? 'NOT RESOLVED';
+
   const updatedAlbumChangedFields = {
     path: updatedAlbum.path,
     ...(updatedAlbum.title !== undefined &&
-    updatedAlbum.title !== currentAlbum.title
+    updatedAlbum.title !== currentAlbumTitle
       ? { title: updatedAlbum.title }
       : {}),
     ...(updatedAlbum.text !== undefined &&
@@ -153,9 +164,12 @@ export const getUpdatedFileChangedFields = (
   updatedFile: UpdatedFile,
   currentFile: Partial<FileInterface> & { filename: string },
 ): UpdatedFile => {
+  const currentFilePath =
+    currentFile.resolved?.path ?? currentFile.path ?? 'NOT RESOLVED';
+
   return {
     filename: updatedFile.filename,
-    ...(updatedFile.path !== undefined && updatedFile.path !== currentFile.path
+    ...(updatedFile.path !== undefined && updatedFile.path !== currentFilePath
       ? { path: updatedFile.path }
       : {}),
     ...(updatedFile.description !== undefined &&
@@ -165,6 +179,12 @@ export const getUpdatedFileChangedFields = (
     ...(updatedFile.text !== undefined &&
     updatedFile.text !== (currentFile.text || '')
       ? { text: updatedFile.text }
+      : {}),
+    ...(updatedFile.tags !== undefined &&
+    updatedFile.tags.join(',') !== (currentFile.tags ?? []).join(',')
+      ? {
+          tags: updatedFile.tags,
+        }
       : {}),
     ...(updatedFile.accesses !== undefined &&
     updatedFile.accesses.join(',') !== (currentFile.accesses ?? []).join(',')
@@ -202,9 +222,10 @@ export const convertDateRangesToParameterString = (
   dateRanges: string[][],
 ): string => `${dateRanges.map((dateRange) => dateRange.join('-')).join(',')}`;
 
-export const getPathWithDateRanges = (
+export const getPathWithDateRangesAndTags = (
   path: string,
   dateRanges?: string[][],
+  tags?: string[],
 ): string =>
   `${path}${
     dateRanges &&
@@ -213,7 +234,7 @@ export const getPathWithDateRanges = (
           dateRanges,
         )}`
       : ''
-  }`;
+  }${dateRanges && tags ? '&' : tags ? '?' : ''}${tags ? `${PARAMETER_TAGS}=${tags.join(',')}` : ''}`;
 
 export const isThisOrChildPath = (
   currentItemPath: string,
@@ -226,10 +247,13 @@ export const getShouldLoad = (
   loadedPaths: string[],
   currentPath: string,
   dateRanges?: string[][],
+  tags?: string[],
 ): boolean => {
-  const path = getPathWithDateRanges(currentPath, dateRanges);
+  const path = getPathWithDateRangesAndTags(currentPath, dateRanges, tags);
 
+  // TODO: Tags
   // TODO: Check if dates are included in the loaded dates
+  // TODO: Check if tags are included in the loaded dates
 
   return loadedPaths.every(
     (loadedPath) => !isThisOrChildPath(path, loadedPath),

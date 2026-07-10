@@ -23,12 +23,15 @@ export const AlbumPage = ({
   const albumAgenda: AgendaInterface[] = albumsWithFiles
     .slice(1)
     .map((albumWithFiles) => ({
-      title: albumWithFiles.album.title,
+      title:
+        albumWithFiles.album?.resolved?.title ??
+        albumWithFiles.album.title ??
+        'NOT RESOLVED',
       path: albumWithFiles.album.path,
     }));
 
   const currentOpenedAlbum = allAlbums.find(
-    (album) => album.path === currentPath
+    (album) => album.path === currentPath,
   );
 
   return (

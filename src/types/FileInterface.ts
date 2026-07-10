@@ -1,13 +1,15 @@
 export interface FileDTO {
   filename: string;
-  path: string;
+  path?: string;
   url: string;
-  resolvedAccesses?: string[];
   description?: string;
   text?: string | string[];
   tags?: string[];
   accesses?: string[];
-  isDb?: true;
+  resolved?: {
+    accesses?: string[];
+    path?: string;
+  };
 }
 
 export interface FileInterface extends FileDTO {

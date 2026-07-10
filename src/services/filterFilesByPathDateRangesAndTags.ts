@@ -19,17 +19,21 @@ export const filterAlbumsByPath = ({
   );
 };
 
-export const filterFilesByPathAndDateRanges = ({
+export const filterFilesByPathDateRangesAndTags = ({
   files,
   currentPath,
   dateRanges,
+  tags,
 }: {
   files: FileInterface[];
   currentPath?: string;
   dateRanges?: string[][];
+  tags?: string[];
 }): FileInterface[] =>
   files.filter((file) => {
-    if (currentPath && !isThisOrChildPath(file.path, currentPath)) {
+    const filePath = file.resolved?.path ?? file.path ?? 'NOT RESOLVED';
+
+    if (currentPath && !isThisOrChildPath(filePath, currentPath)) {
       return false;
     }
 
@@ -41,6 +45,10 @@ export const filterFilesByPathAndDateRanges = ({
           (!to || file.datetime.slice(0, to.length) <= to),
       )
     ) {
+      return false;
+    }
+
+    if (tags && !tags.some((tag) => file.tags?.includes(tag))) {
       return false;
     }
 

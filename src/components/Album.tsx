@@ -29,6 +29,7 @@ export const Album = ({
   const { album, files } = albumWithFiles;
   const level = getLevel(album.path);
   const isCurrentOpenedAlbum = album.path === currentPath;
+  const albumTitle = album.resolved?.title ?? album.title ?? 'NOT RESOLVED';
 
   return (
     <>
@@ -36,7 +37,7 @@ export const Album = ({
 
       {isCurrentOpenedAlbum && (
         <>
-          <Title level={level}>{album.title}</Title>
+          <Title level={level}>{albumTitle}</Title>
 
           {!isShowingByDate && <Agenda agenda={albumAgenda} />}
         </>
@@ -47,7 +48,7 @@ export const Album = ({
           {!isShowingByDate && (
             <Title level={level}>
               <Link id={album.path} to={`/${album.path}`}>
-                {album.title}
+                {albumTitle}
               </Link>{' '}
               <HashLink to={`#${album.path}`}>#</HashLink>
             </Title>
@@ -57,7 +58,9 @@ export const Album = ({
             <>
               {currentOpenedAlbum && (
                 <Title level={getLevel(currentOpenedAlbum.path)}>
-                  {currentOpenedAlbum.title}
+                  {currentOpenedAlbum.resolved?.title ??
+                    currentOpenedAlbum.title ??
+                    'NOT RESOLVED'}
                 </Title>
               )}
               <Title level={3}>

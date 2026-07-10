@@ -1,5 +1,6 @@
 export const PARAMETER_FILE = 'file';
 export const PARAMETER_DATE_RANGES = 'date-ranges';
+export const PARAMETER_TAGS = 'tags';
 export const PARAMETER_TOKEN = 'token';
 
 export const GOOGLE_OAUTH_PROVIDER_CLIENT_ID =

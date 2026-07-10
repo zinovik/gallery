@@ -1,8 +1,8 @@
 import type { AlbumInterface, AlbumWithFiles, FileInterface } from '../types';
 import {
   filterAlbumsByPath,
-  filterFilesByPathAndDateRanges,
-} from './filtersByPathAndDateRanges';
+  filterFilesByPathDateRangesAndTags,
+} from './filterFilesByPathDateRangesAndTags';
 
 const buildByDate = (albums: AlbumInterface[], files: FileInterface[]) => {
   const albumsByPathMap = new Map<string, AlbumInterface>();
@@ -13,12 +13,13 @@ const buildByDate = (albums: AlbumInterface[], files: FileInterface[]) => {
 
   // reverse order (by date)
   [...files].reverse().forEach((file) => {
+    const filePath = file.resolved?.path ?? file.path ?? 'NOT RESOLVED';
+
     if (
       albumsWithFiles.length === 0 ||
-      albumsWithFiles[albumsWithFiles.length - 1].album.path !== file.path
+      albumsWithFiles[albumsWithFiles.length - 1].album.path !== filePath
     ) {
-      const album = albumsByPathMap.get(file.path);
-      if (!album) throw new Error(`Album does not exist: ${file.path}`);
+      const album = albumsByPathMap.get(filePath) ?? { path: filePath };
 
       albumsWithFiles.push({
         album: addedAlbums.has(album.path)
@@ -30,8 +31,10 @@ const buildByDate = (albums: AlbumInterface[], files: FileInterface[]) => {
       // the last album is the save - just add the file
       albumsWithFiles[albumsWithFiles.length - 1].files.push(file);
     }
-    addedAlbums.add(file.path);
+    addedAlbums.add(filePath);
   });
+
+  console.log(albumsWithFiles);
 
   return albumsWithFiles;
 };
@@ -45,9 +48,10 @@ const buildByAlbums = (
 
   const filesByPath = new Map<string, FileInterface[]>();
   files.forEach((file) => {
-    const array = filesByPath.get(file.path) ?? [];
+    const filePath = file.resolved?.path ?? file.path ?? 'NOT RESOLVED';
+    const array = filesByPath.get(filePath) ?? [];
     array.push(file);
-    filesByPath.set(file.path, array);
+    filesByPath.set(filePath, array);
   });
 
   return albumsOrdered.map((album) => ({
@@ -61,16 +65,19 @@ export const getAlbumsWithFilesToShow = ({
   allFiles,
   currentPath,
   dateRanges,
+  tags,
 }: {
   allAlbums: AlbumInterface[];
   allFiles: FileInterface[];
   currentPath: string;
   dateRanges?: string[][];
+  tags?: string[];
 }): AlbumWithFiles[] => {
-  const files = filterFilesByPathAndDateRanges({
+  const files = filterFilesByPathDateRangesAndTags({
     files: allFiles,
     currentPath,
     dateRanges,
+    tags,
   });
 
   const albums = filterAlbumsByPath({
@@ -79,7 +86,7 @@ export const getAlbumsWithFilesToShow = ({
     isShowingByDate: Boolean(dateRanges),
   });
 
-  return dateRanges
+  return dateRanges || tags
     ? buildByDate(albums, files)
     : buildByAlbums(albums, files, currentPath);
 };

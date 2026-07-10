@@ -1,14 +1,16 @@
 export interface AlbumDTO {
   path: string;
-  title: string;
-  resolvedAccesses?: string[];
+  title?: string;
   text?: string | string[];
   filesAmount?: number;
   defaultByDate?: boolean;
   order?: number;
   accesses?: string[];
   defaultAccesses?: string[];
-  isDb?: true;
+  resolved?: {
+    accesses?: string[];
+    title?: string;
+  };
 }
 
 export interface AlbumInterface extends AlbumDTO {

@@ -20,21 +20,19 @@ export const HomePage = ({ albums }: Props) => {
           path,
           filesAmount,
           defaultByDate,
-          resolvedAccesses,
           accesses,
           defaultAccesses,
-          isDb,
+          resolved,
         }) => (
           <div key={path}>
             <h2>
-              {isEditModeEnabled && isDb && '🛢️ '}
               <Link to={getLink(path, defaultByDate)}>{`${title} ${
                 typeof filesAmount === 'number' ? ` (${filesAmount})` : ''
               }`}</Link>
             </h2>
             {isEditModeEnabled && (
               <AdminAccesses
-                resolvedAccesses={resolvedAccesses}
+                resolvedAccesses={resolved?.accesses}
                 accesses={accesses}
                 defaultAccesses={defaultAccesses}
               />

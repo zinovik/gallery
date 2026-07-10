@@ -5,6 +5,8 @@ import {
   apiLoad,
   selectSelectedFiles,
   selectChanges,
+  selectIsEditModeEnabled,
+  resolve,
 } from '../app/stateSlices/allAlbumsAndFilesSlice';
 
 export const AdminChanges = () => {
@@ -13,9 +15,19 @@ export const AdminChanges = () => {
   const selectedFiles = useAppSelector(selectSelectedFiles);
   const {
     remove: { albums: removedAlbums, files: removedFiles },
-    add: { albums: addedAlbums, files: addedFiles },
+    add: { albums: addedAlbums },
     update: { albums: updatedAlbums, files: updatedFiles },
   } = useAppSelector(selectChanges);
+
+  const isEditModeEnabled = useAppSelector(selectIsEditModeEnabled);
+
+  const areChanges =
+    removedAlbums.length > 0 ||
+    removedFiles.length > 0 ||
+    addedAlbums.length > 0 ||
+    updatedAlbums.length > 0 ||
+    updatedFiles.length > 0 ||
+    selectedFiles.length > 0;
 
   return (
     <>
@@ -32,9 +44,6 @@ export const AdminChanges = () => {
       {addedAlbums.map((album) => (
         <div key={album.path}>{`Album ADD: ${JSON.stringify(album)}`}</div>
       ))}
-      {addedFiles.map((file) => (
-        <div key={file.filename}>{`File ADD: ${JSON.stringify(file)}`}</div>
-      ))}
       {updatedAlbums.map((album) => (
         <div key={album.path}>{`Album UPDATE: ${JSON.stringify(album)}`}</div>
       ))}
@@ -42,13 +51,7 @@ export const AdminChanges = () => {
         <div key={file.filename}>{`File UPDATE: ${JSON.stringify(file)}`}</div>
       ))}
 
-      {(removedAlbums.length > 0 ||
-        removedFiles.length > 0 ||
-        addedAlbums.length > 0 ||
-        addedFiles.length > 0 ||
-        updatedAlbums.length > 0 ||
-        updatedFiles.length > 0 ||
-        selectedFiles.length > 0) && (
+      {isEditModeEnabled && (
         <>
           <button
             onClick={async () => {
@@ -56,15 +59,30 @@ export const AdminChanges = () => {
               await dispatch(apiLoad(true));
             }}
           >
-            save changes
+            {areChanges
+              ? 'save changes, and invalidate memory cache'
+              : 'invalidate memory cache'}
           </button>
+
           <button
             onClick={async () => {
-              dispatch(resetUpdated());
+              await dispatch(resolve());
+              await dispatch(apiLoad(true));
+              alert('Done');
             }}
           >
-            cancel changes
+            resolve (cached storage paths)
           </button>
+
+          {areChanges && (
+            <button
+              onClick={async () => {
+                dispatch(resetUpdated());
+              }}
+            >
+              cancel changes
+            </button>
+          )}
         </>
       )}
     </>
