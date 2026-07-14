@@ -4,31 +4,18 @@
 const collator = new Intl.Collator();
 
 export const sortAlbums = <
-  A extends { path: string; order?: number },
-  F extends { filename: string; path?: string; resolved?: { path?: string } },
+  A extends { path: string; order?: number; resolved?: { order?: number } },
 >(
   albums: A[],
-  files: F[],
 ): A[] => {
-  const lastFilenameByTopPath = new Map<string, string>();
-  for (const file of files) {
-    const filePath = file.resolved?.path ?? file.path ?? 'NOT RESOLVED';
-    const slashIndex = filePath.indexOf('/');
-    const topPath =
-      slashIndex === -1 ? filePath : filePath.slice(0, slashIndex);
-    lastFilenameByTopPath.set(topPath, file.filename);
-  }
-
   const topLevelPathsOrdered = albums
     .filter((album) => !album.path.includes('/'))
-    .map((album) => album.path)
-    .sort((path1, path2) => {
-      const lastFilenameAlbum1 = lastFilenameByTopPath.get(path1);
-      const lastFilenameAlbum2 = lastFilenameByTopPath.get(path2);
-      return lastFilenameAlbum1 && lastFilenameAlbum2
-        ? collator.compare(lastFilenameAlbum1, lastFilenameAlbum2)
-        : 0;
-    });
+    .sort((album1, album2) => {
+      const album1Order = album1.resolved?.order ?? album1.order ?? 0;
+      const album2Order = album2.resolved?.order ?? album2.order ?? 0;
+      return album2Order - album1Order;
+    })
+    .map((album) => album.path);
 
   const topLevelIndex = new Map<string, number>();
   topLevelPathsOrdered.forEach((path, index) => topLevelIndex.set(path, index));

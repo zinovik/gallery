@@ -34,8 +34,6 @@ const buildByDate = (albums: AlbumInterface[], files: FileInterface[]) => {
     addedAlbums.add(filePath);
   });
 
-  console.log(albumsWithFiles);
-
   return albumsWithFiles;
 };
 

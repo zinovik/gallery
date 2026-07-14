@@ -343,18 +343,7 @@ const albumsSlice = createSlice({
         state.allFiles = sortFiles(
           uniqueFiles(state.allFiles, mapFilesDtoToFiles(files)),
         );
-        // To keep the right order on the home page level
-        if (pathWithDateRanges === '' || pathWithDateRanges.startsWith('?')) {
-          state.allAlbums = sortAlbums(
-            uniqueAlbums(albums, state.allAlbums),
-            state.allFiles,
-          );
-        } else {
-          state.allAlbums = sortAlbums(
-            uniqueAlbums(state.allAlbums, albums),
-            state.allFiles,
-          );
-        }
+        state.allAlbums = sortAlbums(uniqueAlbums(state.allAlbums, albums));
       })
       .addCase(apiLogin.pending, (state) => {
         state.isApiLogining = true;

@@ -47,10 +47,6 @@ const addAlbums = (
   albums.forEach((album) => {
     const addedAlbum = addedAlbumsMap.get(album.path);
     if (addedAlbum) {
-      console.log({
-        ...album,
-        ...addedAlbum,
-      });
       albumsWithAdded.push({
         ...album,
         ...addedAlbum,
