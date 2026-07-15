@@ -28,7 +28,7 @@ export const HomePage = ({ albums }: Props) => {
             <h2>
               <Link
                 to={getLink(path, defaultByDate)}
-              >{`${resolved?.title ?? title ?? 'NOT RESOLVED'} ${
+              >{`${title ?? resolved?.title ?? 'NOT RESOLVED'} ${
                 typeof filesAmount === 'number' ? ` (${filesAmount})` : ''
               }`}</Link>
             </h2>

@@ -19,7 +19,7 @@ import { request } from '../../services/api/request';
 import { mapFilesDtoToFiles } from '../../services/api/mapFilesDtoToFiles';
 import {
   convertDateRangesToParameterString,
-  getPathWithDateRangesAndTags,
+  getShouldLoad,
   getUpdatedAlbumChangedFields,
   getUpdatedFileChangedFields,
   uniqueAlbums,
@@ -44,7 +44,11 @@ interface AllAlbumsAndFilesState {
   isApiLogining: boolean;
   allAlbums: AlbumInterface[];
   allFiles: FileInterface[];
-  loadedPaths: string[];
+  loadedRequests: {
+    path: string;
+    dateRanges?: string[][];
+    tags?: string[];
+  }[];
   user: User | null;
 
   isEditModeEnabled: boolean;
@@ -62,7 +66,11 @@ const initialState: AllAlbumsAndFilesState = {
   isApiLogining: true,
   allAlbums: [] as AlbumInterface[],
   allFiles: [] as FileInterface[],
-  loadedPaths: [] as string[],
+  loadedRequests: [] as {
+    path: string;
+    dateRanges?: string[][];
+    tags?: string[];
+  }[],
   user: null as User | null,
 
   isEditModeEnabled: false,
@@ -232,12 +240,12 @@ const albumsSlice = createSlice({
 
       const updatedFiles = state.allFiles
         .filter((file) => {
-          const filePath = file.resolved?.path ?? file.path ?? 'NOT RESOLVED';
+          const filePath = file.path ?? file.resolved?.path ?? 'NOT RESOLVED';
 
           return filePath === path || filePath.startsWith(`${path}/`);
         })
         .map((file) => {
-          const filePath = file.resolved?.path ?? file.path ?? 'NOT RESOLVED';
+          const filePath = file.path ?? file.resolved?.path ?? 'NOT RESOLVED';
 
           return {
             filename: file.filename,
@@ -323,27 +331,37 @@ const albumsSlice = createSlice({
         state.user = user;
 
         if (isReplace) {
-          state.loadedPaths = [];
+          state.loadedRequests = [];
           state.allAlbums = [];
           state.allFiles = [];
         }
 
-        const pathWithDateRanges = getPathWithDateRangesAndTags(
-          state.currentPath,
-          state.dateRanges,
-          state.tags,
-        );
-
-        if (state.loadedPaths.includes(pathWithDateRanges)) {
+        if (
+          !getShouldLoad(
+            state.loadedRequests,
+            state.currentPath,
+            state.dateRanges,
+            state.tags,
+          )
+        ) {
           return;
         }
 
-        state.loadedPaths.push(pathWithDateRanges);
+        state.loadedRequests.push({
+          path: state.currentPath,
+          dateRanges: state.dateRanges,
+          tags: state.tags,
+        });
 
         state.allFiles = sortFiles(
           uniqueFiles(state.allFiles, mapFilesDtoToFiles(files)),
         );
-        state.allAlbums = sortAlbums(uniqueAlbums(state.allAlbums, albums));
+        if (!state.currentPath && !state.dateRanges) {
+          // we have filesAmounts
+          state.allAlbums = sortAlbums(uniqueAlbums(albums, state.allAlbums));
+        } else {
+          state.allAlbums = sortAlbums(uniqueAlbums(state.allAlbums, albums));
+        }
       })
       .addCase(apiLogin.pending, (state) => {
         state.isApiLogining = true;
@@ -490,8 +508,8 @@ export const selectAllAlbums = (state: RootState) =>
 export const selectAllFiles = (state: RootState) =>
   state.allAlbumsAndFiles.allFiles;
 
-export const selectLoadedPaths = (state: RootState) =>
-  state.allAlbumsAndFiles.loadedPaths;
+export const selectLoadedRequests = (state: RootState) =>
+  state.allAlbumsAndFiles.loadedRequests;
 
 export const selectUser = (state: RootState) => state.allAlbumsAndFiles.user;
 export const selectTokenExpiresAt = (state: RootState) =>

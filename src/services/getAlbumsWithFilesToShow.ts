@@ -13,7 +13,7 @@ const buildByDate = (albums: AlbumInterface[], files: FileInterface[]) => {
 
   // reverse order (by date)
   [...files].reverse().forEach((file) => {
-    const filePath = file.resolved?.path ?? file.path ?? 'NOT RESOLVED';
+    const filePath = file.path ?? file.resolved?.path ?? 'NOT RESOLVED';
 
     if (
       albumsWithFiles.length === 0 ||
@@ -46,7 +46,7 @@ const buildByAlbums = (
 
   const filesByPath = new Map<string, FileInterface[]>();
   files.forEach((file) => {
-    const filePath = file.resolved?.path ?? file.path ?? 'NOT RESOLVED';
+    const filePath = file.path ?? file.resolved?.path ?? 'NOT RESOLVED';
     const array = filesByPath.get(filePath) ?? [];
     array.push(file);
     filesByPath.set(filePath, array);

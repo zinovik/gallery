@@ -44,7 +44,7 @@ export const AdminFile = ({ file }: Props) => {
       />
       <button
         onClick={async () => {
-          const filePath = file.resolved?.path ?? file.path ?? 'NOT RESOLVED';
+          const filePath = file.path ?? file.resolved?.path ?? 'NOT RESOLVED';
 
           const newPath = prompt('path', filePath);
           if (newPath === null) return;
@@ -155,6 +155,7 @@ export const AdminFile = ({ file }: Props) => {
         resolvedAccesses={file.resolved?.accesses}
         accesses={file.accesses}
       />
+      {file.tags ? ` [${file.tags.join(',')}]` : ''}
     </>
   );
 };

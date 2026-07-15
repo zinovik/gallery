@@ -31,7 +31,7 @@ export const filterFilesByPathDateRangesAndTags = ({
   tags?: string[];
 }): FileInterface[] =>
   files.filter((file) => {
-    const filePath = file.resolved?.path ?? file.path ?? 'NOT RESOLVED';
+    const filePath = file.path ?? file.resolved?.path ?? 'NOT RESOLVED';
 
     if (currentPath && !isThisOrChildPath(filePath, currentPath)) {
       return false;

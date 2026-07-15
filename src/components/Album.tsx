@@ -29,7 +29,7 @@ export const Album = ({
   const { album, files } = albumWithFiles;
   const level = getLevel(album.path);
   const isCurrentOpenedAlbum = album.path === currentPath;
-  const albumTitle = album.resolved?.title ?? album.title ?? 'NOT RESOLVED';
+  const albumTitle = album.title ?? album.resolved?.title ?? 'NOT RESOLVED';
 
   return (
     <>
@@ -58,8 +58,8 @@ export const Album = ({
             <>
               {currentOpenedAlbum && (
                 <Title level={getLevel(currentOpenedAlbum.path)}>
-                  {currentOpenedAlbum.resolved?.title ??
-                    currentOpenedAlbum.title ??
+                  {currentOpenedAlbum.title ??
+                    currentOpenedAlbum.resolved?.title ??
                     'NOT RESOLVED'}
                 </Title>
               )}

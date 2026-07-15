@@ -33,7 +33,7 @@ export const AdminAlbum = ({ album }: Props) => {
       <button
         onClick={() => {
           const albumTitle =
-            album.resolved?.title ?? album.title ?? 'NOT RESOLVED';
+            album.title ?? album.resolved?.title ?? 'NOT RESOLVED';
 
           const newPath = prompt('path', album.path);
           if (newPath === null) return;
@@ -104,7 +104,7 @@ export const AdminAlbum = ({ album }: Props) => {
           if (path === null) return;
 
           const albumTitle =
-            album.resolved?.title ?? album.title ?? 'NOT RESOLVED';
+            album.title ?? album.resolved?.title ?? 'NOT RESOLVED';
 
           dispatch(
             addAddedAlbum({
@@ -148,8 +148,17 @@ export const AdminAlbum = ({ album }: Props) => {
           const expiresIn = prompt('expires in, h', '24');
           if (expiresIn === null) return;
 
+          const query = new URLSearchParams({ expires_in_h: expiresIn });
+
+          searchParams
+            .getAll('tags')
+            .forEach((tag) => query.append('tags', tag));
+          searchParams
+            .getAll('dateRanges')
+            .forEach((range) => query.append('dateRanges', range));
+
           const responseJson = await request(
-            `/auth/share/${album.path}?expires_in_h=${expiresIn}`,
+            `/auth/share/${album.path}?${query.toString()}`,
           );
 
           if (!responseJson) return;

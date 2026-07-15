@@ -24,8 +24,8 @@ export const AlbumPage = ({
     .slice(1)
     .map((albumWithFiles) => ({
       title:
-        albumWithFiles.album?.resolved?.title ??
         albumWithFiles.album.title ??
+        albumWithFiles.album.resolved?.title ??
         'NOT RESOLVED',
       path: albumWithFiles.album.path,
     }));

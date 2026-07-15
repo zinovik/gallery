@@ -72,7 +72,7 @@ export const getLinks = ({
     const album = allAlbums.find((album) => album.path === textPath);
     const url = getLink(textPath);
 
-    const albumTitle = album?.resolved?.title ?? album?.title ?? 'NOT RESOLVED';
+    const albumTitle = album?.title ?? album?.resolved?.title ?? 'NOT RESOLVED';
 
     return {
       text: albumTitle,
@@ -123,7 +123,7 @@ export const getUpdatedAlbumChangedFields = (
   newPath?: string | null;
 } => {
   const currentAlbumTitle =
-    currentAlbum.resolved?.title ?? currentAlbum.title ?? 'NOT RESOLVED';
+    currentAlbum.title ?? currentAlbum.resolved?.title ?? 'NOT RESOLVED';
 
   const updatedAlbumChangedFields = {
     path: updatedAlbum.path,
@@ -165,7 +165,7 @@ export const getUpdatedFileChangedFields = (
   currentFile: Partial<FileInterface> & { filename: string },
 ): UpdatedFile => {
   const currentFilePath =
-    currentFile.resolved?.path ?? currentFile.path ?? 'NOT RESOLVED';
+    currentFile.path ?? currentFile.resolved?.path ?? 'NOT RESOLVED';
 
   return {
     filename: updatedFile.filename,
@@ -222,20 +222,6 @@ export const convertDateRangesToParameterString = (
   dateRanges: string[][],
 ): string => `${dateRanges.map((dateRange) => dateRange.join('-')).join(',')}`;
 
-export const getPathWithDateRangesAndTags = (
-  path: string,
-  dateRanges?: string[][],
-  tags?: string[],
-): string =>
-  `${path}${
-    dateRanges &&
-    dateRanges.find((dateRange) => dateRange.find((date) => date !== ''))
-      ? `?${PARAMETER_DATE_RANGES}=${convertDateRangesToParameterString(
-          dateRanges,
-        )}`
-      : ''
-  }${dateRanges && tags ? '&' : tags ? '?' : ''}${tags ? `${PARAMETER_TAGS}=${tags.join(',')}` : ''}`;
-
 export const isThisOrChildPath = (
   currentItemPath: string,
   requiredPath: string,
@@ -244,18 +230,100 @@ export const isThisOrChildPath = (
   currentItemPath.startsWith(`${requiredPath}/`);
 
 export const getShouldLoad = (
-  loadedPaths: string[],
+  loadedRequests: {
+    path: string;
+    dateRanges?: string[][];
+    tags?: string[];
+  }[],
   currentPath: string,
   dateRanges?: string[][],
   tags?: string[],
 ): boolean => {
-  const path = getPathWithDateRangesAndTags(currentPath, dateRanges, tags);
-
-  // TODO: Tags
-  // TODO: Check if dates are included in the loaded dates
-  // TODO: Check if tags are included in the loaded dates
-
-  return loadedPaths.every(
-    (loadedPath) => !isThisOrChildPath(path, loadedPath),
+  const thisOrParentPathRequests = loadedRequests.filter((loadedRequest) =>
+    isThisOrChildPath(currentPath, loadedRequest.path),
   );
+
+  // didn't load this path
+  if (thisOrParentPathRequests.length === 0) {
+    return true;
+  }
+
+  const loadedAllDateRanges =
+    currentPath &&
+    thisOrParentPathRequests.some(
+      (loadedRequest) =>
+        !loadedRequest.dateRanges ||
+        loadedRequest.dateRanges.every(([from, to]) => !from && !to),
+    );
+  const loadedAllTags = thisOrParentPathRequests.some(
+    (loadedRequest) => !loadedRequest.tags,
+  );
+  const homeLoaded = thisOrParentPathRequests.some(
+    (loadedRequest) => loadedRequest.path === '' && !loadedRequest.dateRanges,
+  );
+
+  if (currentPath === '' && !dateRanges && !tags && homeLoaded) {
+    return false;
+  }
+
+  // loaded all for this path
+  if (loadedAllDateRanges && loadedAllTags) {
+    return false;
+  }
+
+  // need to load more dates
+  if (!dateRanges && !loadedAllDateRanges) {
+    return true;
+  }
+
+  // need to load more tags
+  if (!tags && !loadedAllTags) {
+    return true;
+  }
+
+  let minFrom: string | undefined;
+  let maxTo: string | undefined;
+  const loadedTags: string[] = [];
+
+  thisOrParentPathRequests.forEach((loadedRequest) => {
+    if (loadedRequest.dateRanges) {
+      loadedRequest.dateRanges.forEach(([from, to]) => {
+        if (!minFrom || minFrom > from) {
+          minFrom = from;
+        }
+
+        if (!maxTo || maxTo < to) {
+          maxTo = to;
+        }
+      });
+    }
+
+    if (loadedRequest.tags) {
+      loadedTags.push(...loadedRequest.tags);
+    }
+  });
+
+  if (!currentPath && !minFrom && !maxTo) {
+    return true;
+  }
+
+  if (
+    dateRanges &&
+    !loadedAllDateRanges &&
+    !dateRanges.every(
+      ([from, to]) => (!minFrom || from >= minFrom) && (!maxTo || to <= maxTo),
+    )
+  ) {
+    return true;
+  }
+
+  if (
+    tags &&
+    !loadedAllTags &&
+    !tags.every((tag) => loadedTags.includes(tag))
+  ) {
+    return true;
+  }
+
+  return false;
 };

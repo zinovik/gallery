@@ -13,7 +13,7 @@ export const sortAlbums = <
   for (const album of albums) {
     pathPartsByPath.set(album.path, album.path.split('/'));
 
-    const albumOrder = album.resolved?.order ?? album.order ?? 0;
+    const albumOrder = album.order ?? album.resolved?.order;
     if (albumOrder !== undefined) {
       pathOrderMap.set(album.path, albumOrder);
     }
