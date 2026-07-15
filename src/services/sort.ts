@@ -8,25 +8,14 @@ export const sortAlbums = <
 >(
   albums: A[],
 ): A[] => {
-  const topLevelPathsOrdered = albums
-    .filter((album) => !album.path.includes('/'))
-    .sort((album1, album2) => {
-      const album1Order = album1.resolved?.order ?? album1.order ?? 0;
-      const album2Order = album2.resolved?.order ?? album2.order ?? 0;
-      return album2Order - album1Order;
-    })
-    .map((album) => album.path);
-
-  const topLevelIndex = new Map<string, number>();
-  topLevelPathsOrdered.forEach((path, index) => topLevelIndex.set(path, index));
-
   const pathPartsByPath = new Map<string, string[]>();
   const pathOrderMap = new Map<string, number>();
   for (const album of albums) {
     pathPartsByPath.set(album.path, album.path.split('/'));
 
-    if (album.order !== undefined) {
-      pathOrderMap.set(album.path, album.order);
+    const albumOrder = album.resolved?.order ?? album.order ?? 0;
+    if (albumOrder !== undefined) {
+      pathOrderMap.set(album.path, albumOrder);
     }
   }
 
@@ -36,9 +25,9 @@ export const sortAlbums = <
 
     // different root paths
     if (a1PathParts[0] !== a2PathParts[0]) {
-      const i1 = topLevelIndex.get(a1PathParts[0]) ?? -1;
-      const i2 = topLevelIndex.get(a2PathParts[0]) ?? -1;
-      return i1 - i2;
+      const i1 = pathOrderMap.get(a1PathParts[0]) ?? -1;
+      const i2 = pathOrderMap.get(a2PathParts[0]) ?? -1;
+      return i2 - i1;
     }
 
     // the same root path

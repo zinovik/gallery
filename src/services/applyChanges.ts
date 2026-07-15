@@ -154,7 +154,7 @@ export const applyChanges = ({
   const filesWithUpdated = updateFiles(filesWithoutRemoved, updatedFiles);
 
   return {
-    albums: sortAlbums(albumsWithUpdated, filesWithUpdated),
+    albums: sortAlbums(albumsWithUpdated),
     files: sortFiles(filesWithUpdated),
   };
 };
