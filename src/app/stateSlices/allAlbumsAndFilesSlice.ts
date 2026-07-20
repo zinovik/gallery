@@ -38,7 +38,7 @@ interface AllAlbumsAndFilesState {
   currentPath: string;
   dateRanges?: string[][];
   tags?: string[];
-  token: string;
+  token: string | null;
   tokenExpiresAt: number;
   isApiLoading: boolean;
   isApiLogining: boolean;
@@ -60,7 +60,7 @@ const initialState: AllAlbumsAndFilesState = {
   currentPath: '',
   dateRanges: undefined,
   tags: undefined,
-  token: '',
+  token: null,
   tokenExpiresAt: 0,
   isApiLoading: false,
   isApiLogining: true,
@@ -100,7 +100,7 @@ const albumsSlice = createSlice({
         currentPath: string;
         dateRanges?: string[][];
         tags?: string[];
-        token: string;
+        token: string | null;
       }>,
     ) => {
       state.currentPath = action.payload.currentPath;
@@ -415,7 +415,7 @@ export const apiLoad = createAppAsyncThunk(
       { name: 'token', value: token },
       {
         name: PARAMETER_DATE_RANGES,
-        value: convertDateRangesToParameterString(dateRanges ?? []),
+        value: dateRanges && convertDateRangesToParameterString(dateRanges),
       },
       {
         name: PARAMETER_TAGS,

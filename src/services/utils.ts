@@ -20,8 +20,8 @@ export const parseUrl = (
   currentPath: string;
   dateRanges?: string[][];
   tags?: string[];
-  token: string;
-  scrolledToFile: string;
+  token: string | null;
+  scrolledToFile: string | null;
   scrolledToAlbum: string;
 } => {
   const { '*': route = '' } = params;
@@ -35,10 +35,10 @@ export const parseUrl = (
   const tagsParameter = searchParams.get(PARAMETER_TAGS);
   const tags = tagsParameter?.split(',');
 
-  const scrolledToFile = searchParams.get(PARAMETER_FILE) ?? '';
+  const scrolledToFile = searchParams.get(PARAMETER_FILE);
   const scrolledToAlbum = location.hash.substring(1);
 
-  const token = searchParams.get(PARAMETER_TOKEN) || '';
+  const token = searchParams.get(PARAMETER_TOKEN);
 
   return {
     currentPath,
@@ -77,7 +77,6 @@ export const getLinks = ({
     return {
       text: albumTitle,
       url,
-      ...(album ? {} : { isGenerateAlbum: true }),
     };
   });
 
@@ -248,82 +247,40 @@ export const getShouldLoad = (
     return true;
   }
 
-  const loadedAllDateRanges =
-    currentPath &&
-    thisOrParentPathRequests.some(
-      (loadedRequest) =>
-        !loadedRequest.dateRanges ||
-        loadedRequest.dateRanges.every(([from, to]) => !from && !to),
-    );
-  const loadedAllTags = thisOrParentPathRequests.some(
-    (loadedRequest) => !loadedRequest.tags,
-  );
-  const homeLoaded = thisOrParentPathRequests.some(
-    (loadedRequest) => loadedRequest.path === '' && !loadedRequest.dateRanges,
-  );
+  for (const loadedRequest of thisOrParentPathRequests) {
+    const loadedAllDateRanges =
+      (!loadedRequest.dateRanges && currentPath !== '') ||
+      loadedRequest.dateRanges?.every(([from, to]) => !from && !to);
 
-  if (currentPath === '' && !dateRanges && !tags && homeLoaded) {
-    return false;
-  }
+    const loadedAllTags = !loadedRequest.tags;
 
-  // loaded all for this path
-  if (loadedAllDateRanges && loadedAllTags) {
-    return false;
-  }
+    const homeLoaded =
+      loadedRequest.path === '' &&
+      !loadedRequest.dateRanges &&
+      !loadedRequest.tags;
 
-  // need to load more dates
-  if (!dateRanges && !loadedAllDateRanges) {
-    return true;
-  }
-
-  // need to load more tags
-  if (!tags && !loadedAllTags) {
-    return true;
-  }
-
-  let minFrom: string | undefined;
-  let maxTo: string | undefined;
-  const loadedTags: string[] = [];
-
-  thisOrParentPathRequests.forEach((loadedRequest) => {
-    if (loadedRequest.dateRanges) {
-      loadedRequest.dateRanges.forEach(([from, to]) => {
-        if (!minFrom || minFrom > from) {
-          minFrom = from;
-        }
-
-        if (!maxTo || maxTo < to) {
-          maxTo = to;
-        }
-      });
+    if (currentPath === '' && !dateRanges && !tags && homeLoaded) {
+      return false;
     }
 
-    if (loadedRequest.tags) {
-      loadedTags.push(...loadedRequest.tags);
+    // loaded all for this path
+    if (loadedAllDateRanges && loadedAllTags) {
+      return false;
     }
-  });
 
-  if (!currentPath && !minFrom && !maxTo) {
-    return true;
+    if (
+      JSON.stringify({
+        dateRanges: loadedRequest.dateRanges,
+        tags: loadedRequest.tags,
+      }) ===
+      JSON.stringify({
+        dateRanges: dateRanges,
+        tags: tags,
+      })
+    ) {
+      return false;
+    }
   }
 
-  if (
-    dateRanges &&
-    !loadedAllDateRanges &&
-    !dateRanges.every(
-      ([from, to]) => (!minFrom || from >= minFrom) && (!maxTo || to <= maxTo),
-    )
-  ) {
-    return true;
-  }
-
-  if (
-    tags &&
-    !loadedAllTags &&
-    !tags.every((tag) => loadedTags.includes(tag))
-  ) {
-    return true;
-  }
-
-  return false;
+  return true;
 };

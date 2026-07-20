@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 
 interface Props {
   currentPath: string;
-  scrolledToFile: string;
+  scrolledToFile: string | null;
   scrolledToAlbum: string;
 }
 
