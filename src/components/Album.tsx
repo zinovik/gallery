@@ -33,7 +33,7 @@ export const Album = ({
 
   return (
     <>
-      <AdminAlbum album={album} />
+      <AdminAlbum albumWithFiles={albumWithFiles} />
 
       {isCurrentOpenedAlbum && (
         <>

@@ -158,9 +158,11 @@ const albumsSlice = createSlice({
     },
     addUpdatedAlbum: (state, action: PayloadAction<UpdatedAlbum>) => {
       const updatedAlbum = action.payload;
-      const currentAlbum = state.allAlbums.find(
-        (album) => album.path === updatedAlbum.path,
-      );
+      const currentAlbum =
+        state.allAlbums.find((album) => album.path === updatedAlbum.path) ??
+        state.changes.add.albums.find(
+          (album) => album.path === updatedAlbum.path,
+        );
 
       if (!currentAlbum) {
         alert('error updating the album!');

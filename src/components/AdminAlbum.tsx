@@ -1,8 +1,9 @@
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import type { AlbumInterface } from '../types';
+import type { AlbumWithFiles } from '../types';
 import {
   addAddedAlbum,
   addRemovedAlbum,
+  addSelectedFile,
   addUpdatedAlbum,
   newAlbumPath,
   selectIsEditModeEnabled,
@@ -13,10 +14,12 @@ import { PARAMETER_TOKEN } from '../constants';
 import { AdminAccesses } from './AdminAccesses';
 
 interface Props {
-  album: AlbumInterface;
+  albumWithFiles: AlbumWithFiles;
 }
 
-export const AdminAlbum = ({ album }: Props) => {
+export const AdminAlbum = ({ albumWithFiles }: Props) => {
+  const { album, files } = albumWithFiles;
+
   const dispatch = useAppDispatch();
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -30,6 +33,16 @@ export const AdminAlbum = ({ album }: Props) => {
 
   return (
     <>
+      <button
+        onClick={() => {
+          files.forEach((file) => {
+            dispatch(addSelectedFile(file.filename));
+          });
+        }}
+      >
+        select all files
+      </button>
+
       <button
         onClick={() => {
           const albumTitle =
@@ -102,14 +115,15 @@ export const AdminAlbum = ({ album }: Props) => {
         onClick={() => {
           const path = prompt('path', album.path);
           if (path === null) return;
-
           const albumTitle =
             album.title ?? album.resolved?.title ?? 'NOT RESOLVED';
+          const newTitle = prompt('title', albumTitle);
+          if (newTitle === null) return;
 
           dispatch(
             addAddedAlbum({
               path,
-              title: albumTitle,
+              title: newTitle,
             }),
           );
         }}
