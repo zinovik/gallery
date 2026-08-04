@@ -159,10 +159,15 @@ export const AdminAlbum = ({ albumWithFiles }: Props) => {
 
       <button
         onClick={async () => {
-          const expiresIn = prompt('expires in, h', '24');
+          const expiresIn = prompt('expires in, h', '168');
           if (expiresIn === null) return;
+          const accesses = prompt('accesses', '');
+          if (accesses === null) return;
 
-          const query = new URLSearchParams({ expires_in_h: expiresIn });
+          const query = new URLSearchParams({
+            expires_in_h: expiresIn,
+            accesses,
+          });
 
           searchParams
             .getAll('tags')
