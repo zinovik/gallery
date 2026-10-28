@@ -16,9 +16,10 @@ interface Props {
 export const File = ({ file, isCurrent }: Props) => {
   const { url, type, description, datetime, text } = file;
 
-  const descriptionWithDatetime = `${description ? description : ''}${
-    description && datetime ? ', ' : ''
-  }${formatDatetime(datetime)}`;
+  const descriptionWithDatetime =
+    `${description ? description : ''}${
+      description && datetime ? ', ' : ''
+    }${formatDatetime(datetime)}` || file.filename;
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -57,7 +58,14 @@ export const File = ({ file, isCurrent }: Props) => {
         <Markdown text={text} />
 
         <LazyLoad offset={Math.min(window.innerWidth, 880) * 0.75}>
-          <div style={{ textAlign: 'center' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexDirection: 'column',
+            }}
+          >
             {type === 'image' && (
               <Image
                 url={url}

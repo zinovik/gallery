@@ -10,7 +10,7 @@ export const Video = ({ url, onClick }: Props) => {
         <div
           onClick={onClick}
           className="link"
-          style={{ textAlign: 'right', cursor: 'pointer' }}
+          style={{ alignSelf: 'flex-end', cursor: 'pointer' }}
         >
           file link
         </div>
