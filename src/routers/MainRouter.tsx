@@ -117,7 +117,8 @@ export const MainRouter = () => {
                   <AlbumPage
                     albumsWithFiles={albumsWithFilesToShow}
                     currentPath={currentPath}
-                    isShowingByDate={Boolean(dateRanges)}
+                    dateRanges={dateRanges}
+                    tags={tags}
                     currentFile={scrolledToFile}
                   />
 

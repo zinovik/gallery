@@ -52,8 +52,28 @@ export const parseUrl = (
 
 export const getLevel = (path: string): number => path.split('/').length;
 
-export const getLink = (path: string, defaultByDate?: boolean) =>
-  `/${path}${defaultByDate ? `?${PARAMETER_DATE_RANGES}=` : ''}`;
+export const getLink = (
+  path: string,
+  dateRanges?: string[][],
+  tags?: string[],
+) => {
+  const params = new URLSearchParams();
+
+  if (dateRanges !== undefined) {
+    params.set(
+      PARAMETER_DATE_RANGES,
+      dateRanges.map((dateRange) => dateRange.join('-')).join(','),
+    );
+  }
+
+  if (tags?.length) {
+    params.set(PARAMETER_TAGS, tags.join(','));
+  }
+
+  const query = params.toString();
+
+  return `/${path}${query ? `?${query}` : ''}`;
+};
 
 export const getLinks = ({
   albumPath = '',

@@ -4,18 +4,23 @@ import { Navigation } from '../components/Navigation';
 import { useAppSelector } from '../app/hooks';
 import { selectAllAlbums } from '../app/stateSlices/allAlbumsAndFilesSlice';
 import { Title } from '../components/Title';
+import { Link } from 'react-router-dom';
+import { getLink } from '../services/utils';
+import { useMemo } from 'react';
 
 interface Props {
   albumsWithFiles: AlbumWithFiles[];
   currentPath: string;
-  isShowingByDate: boolean;
+  dateRanges?: string[][];
+  tags?: string[];
   currentFile: string | null;
 }
 
 export const AlbumPage = ({
   albumsWithFiles,
   currentPath,
-  isShowingByDate,
+  dateRanges,
+  tags,
   currentFile,
 }: Props) => {
   const allAlbums = useAppSelector(selectAllAlbums);
@@ -34,6 +39,21 @@ export const AlbumPage = ({
     (album) => album.path === currentPath,
   );
 
+  const filesTags = useMemo(
+    () => [
+      ...new Set(
+        albumsWithFiles
+          .flatMap((albumWithFiles) =>
+            albumWithFiles.files
+              .flatMap((file) => file.tags ?? [])
+              .filter(Boolean),
+          )
+          .sort(),
+      ),
+    ],
+    [albumsWithFiles],
+  );
+
   return (
     <>
       {albumsWithFiles.length > 0 && (
@@ -43,6 +63,43 @@ export const AlbumPage = ({
       )}
 
       <main>
+        {filesTags.length > 0 && (
+          <div style={{ textAlign: 'center' }}>
+            {[...filesTags, 'all'].map((filesTag, index) => (
+              <span key={filesTag}>
+                {index > 0 && ' '}
+                {index === filesTags.length ? (
+                  !tags || tags.length === 0 ? (
+                    filesTag
+                  ) : (
+                    <Link
+                      to={getLink(
+                        currentOpenedAlbum?.path ?? '',
+                        dateRanges,
+                        [],
+                      )}
+                    >
+                      {filesTag}
+                    </Link>
+                  )
+                ) : (
+                  <Link
+                    to={getLink(
+                      currentOpenedAlbum?.path ?? '',
+                      dateRanges,
+                      tags?.includes(filesTag)
+                        ? tags.filter((tag) => tag !== filesTag)
+                        : [...(tags ?? []), filesTag],
+                    )}
+                  >
+                    {tags?.includes(filesTag) ? `[#${filesTag}]` : `#${filesTag}`}
+                  </Link>
+                )}
+              </span>
+            ))}
+          </div>
+        )}
+
         {albumsWithFiles.map((albumWithFiles, index) => (
           <div
             id={currentPath}
@@ -57,7 +114,7 @@ export const AlbumPage = ({
               currentPath={currentPath}
               albumAgenda={albumAgenda}
               currentFile={currentFile}
-              isShowingByDate={isShowingByDate}
+              isShowingByDate={Boolean(dateRanges)}
               currentOpenedAlbum={index === 0 ? currentOpenedAlbum : undefined}
             />
           </div>

@@ -27,11 +27,12 @@ export const HomePage = ({ albums }: Props) => {
           <div key={path}>
             <h2>
               <Link
-                to={getLink(path, defaultByDate)}
+                to={getLink(path, defaultByDate ? [] : undefined)}
               >{`${title ?? resolved?.title ?? 'NOT RESOLVED'} ${
                 typeof filesAmount === 'number' ? ` (${filesAmount})` : ''
               }`}</Link>
             </h2>
+
             {isEditModeEnabled && (
               <AdminAccesses
                 resolvedAccesses={resolved?.accesses}
