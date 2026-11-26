@@ -4,9 +4,8 @@ import { Navigation } from '../components/Navigation';
 import { useAppSelector } from '../app/hooks';
 import { selectAllAlbums } from '../app/stateSlices/allAlbumsAndFilesSlice';
 import { Title } from '../components/Title';
-import { Link } from 'react-router-dom';
-import { getLink } from '../services/utils';
 import { useMemo } from 'react';
+import { Tags } from '../components/Tags';
 
 interface Props {
   albumsWithFiles: AlbumWithFiles[];
@@ -63,42 +62,12 @@ export const AlbumPage = ({
       )}
 
       <main>
-        {filesTags.length > 0 && (
-          <div style={{ textAlign: 'center' }}>
-            {[...filesTags, 'all'].map((filesTag, index) => (
-              <span key={filesTag}>
-                {index > 0 && ' '}
-                {index === filesTags.length ? (
-                  !tags || tags.length === 0 ? (
-                    filesTag
-                  ) : (
-                    <Link
-                      to={getLink(
-                        currentOpenedAlbum?.path ?? '',
-                        dateRanges,
-                        [],
-                      )}
-                    >
-                      {filesTag}
-                    </Link>
-                  )
-                ) : (
-                  <Link
-                    to={getLink(
-                      currentOpenedAlbum?.path ?? '',
-                      dateRanges,
-                      tags?.includes(filesTag)
-                        ? tags.filter((tag) => tag !== filesTag)
-                        : [...(tags ?? []), filesTag],
-                    )}
-                  >
-                    {tags?.includes(filesTag) ? `[#${filesTag}]` : `#${filesTag}`}
-                  </Link>
-                )}
-              </span>
-            ))}
-          </div>
-        )}
+        <Tags
+          filesTags={filesTags}
+          currentPath={currentOpenedAlbum?.path ?? ''}
+          tags={tags}
+          dateRanges={dateRanges}
+        />
 
         {albumsWithFiles.map((albumWithFiles, index) => (
           <div

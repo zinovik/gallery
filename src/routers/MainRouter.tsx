@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams, useSearchParams, useLocation } from 'react-router-dom';
 import { AlbumPage } from '../pages/AlbumPage';
 import { HomePage } from '../pages/HomePage';
@@ -18,10 +18,14 @@ import {
   selectIsApiLogining,
   selectLoadedRequests,
   setShowingProperties,
+  selectUser,
 } from '../app/stateSlices/allAlbumsAndFilesSlice';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { ScrollTo } from '../components/ScrollTo';
 import { Spinner } from '../components/Spinner';
+
+const CATEGORIES_TO_HIDE = ['gigs-posters', 'gigs', 'board-games'];
+const CATEGORIES_HIDDEN_BY_DEFAULT_EMAILS = ['zinovikos@gmail.com'];
 
 export const MainRouter = () => {
   const dispatch = useAppDispatch();
@@ -87,6 +91,29 @@ export const MainRouter = () => {
 
   const isApiLogining = useAppSelector(selectIsApiLogining);
 
+  const [hiddenCategories, setHiddenCategories] = useState<
+    string[] | undefined
+  >(undefined);
+  const user = useAppSelector(selectUser);
+  if (hiddenCategories === undefined && user?.email !== undefined) {
+    setHiddenCategories(
+      CATEGORIES_HIDDEN_BY_DEFAULT_EMAILS.includes(user?.email)
+        ? CATEGORIES_TO_HIDE
+        : [],
+    );
+  }
+  const albumsWithFilesToShowFiltered =
+    hiddenCategories !== undefined && hiddenCategories?.length > 0
+      ? albumsWithFilesToShow.filter(
+          (albumWithFiles) =>
+            !hiddenCategories.some(
+              (path) =>
+                albumWithFiles.album.path === path ||
+                albumWithFiles.album.path.startsWith(`${path}/`),
+            ),
+        )
+      : albumsWithFilesToShow;
+
   return (
     <>
       <AdminChanges />
@@ -100,22 +127,44 @@ export const MainRouter = () => {
         </>
       )}
 
+      {!isApiLogining && hiddenCategories && (
+        <div style={{ textAlign: 'center', paddingTop: '0.5rem' }}>
+          <span>Hide:</span>
+          {CATEGORIES_TO_HIDE.map((category) => (
+            <label style={{ paddingLeft: '0.3rem' }} key={category}>
+              <input
+                type="checkbox"
+                checked={hiddenCategories.includes(category)}
+                onChange={() =>
+                  setHiddenCategories(
+                    hiddenCategories.includes(category)
+                      ? hiddenCategories.filter((c) => c !== category)
+                      : [...hiddenCategories, category],
+                  )
+                }
+              />
+              <span>{category}</span>
+            </label>
+          ))}
+        </div>
+      )}
+
       {(isApiLoading || isApiLogining) && <Spinner />}
 
       {!isApiLoading && !shouldLoad && (
         <>
-          {albumsWithFilesToShow.length > 0 && (
+          {albumsWithFilesToShowFiltered.length > 0 && (
             <>
               {!dateRanges && currentPath === '' ? (
                 <HomePage
-                  albums={albumsWithFilesToShow.map(
+                  albums={albumsWithFilesToShowFiltered.map(
                     (albumWithFiles) => albumWithFiles.album,
                   )}
                 />
               ) : (
                 <>
                   <AlbumPage
-                    albumsWithFiles={albumsWithFilesToShow}
+                    albumsWithFiles={albumsWithFilesToShowFiltered}
                     currentPath={currentPath}
                     dateRanges={dateRanges}
                     tags={tags}
@@ -132,7 +181,7 @@ export const MainRouter = () => {
             </>
           )}
 
-          {albumsWithFilesToShow.length === 0 && (
+          {albumsWithFilesToShowFiltered.length === 0 && (
             <>
               <Navigation />
               <main style={{ padding: '1rem' }}>
